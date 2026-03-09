@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Meme Gallery</title>
+</head>
+<body>
+
+<h2>Meme Gallery</h2>
+
+<div th:each="meme : ${memes}">
+    <h3 th:text="${meme.title}"></h3>
+    <p th:text="${meme.tag}"></p>
+
+    <img th:src="@{'/uploads/' + ${meme.imagePath}}"
+         width="300"/>
+
+    <form th:action="@{'/memes/' + ${meme.id}}"
+          method="post">
+
+        <input type="hidden" name="_method" value="delete"/>
+        <button type="submit">Delete</button>
+
+    </form>
+    <hr>
+</div>
+
+</body>
+</html>

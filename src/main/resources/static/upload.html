@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Meme</title>
+</head>
+<body>
+
+<h2>Upload Meme</h2>
+
+<form action="/memes" method="post" enctype="multipart/form-data">
+
+    Title:
+    <input type="text" name="title" required><br><br>
+
+    Tag:
+    <input type="text" name="tag" required><br><br>
+
+    Image:
+    <input type="file" name="image" required><br><br>
+
+    <button type="submit">Upload</button>
+
+</form>
+
+</body>
+</html>
