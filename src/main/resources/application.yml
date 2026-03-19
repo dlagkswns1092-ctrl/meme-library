@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/meme_db
+    url: jdbc:postgresql://localhost:5432/meme_library
     username: postgres
-    password: Chos1234!
+    password: hw040504@@
 
   mvc:
     hiddenmethod:
