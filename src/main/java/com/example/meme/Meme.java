@@ -1,31 +1,40 @@
 package com.example.meme;
 
 import jakarta.persistence.*;
+import java.util.List;
 
 @Entity
+@Table(name = "memes")
 public class Meme {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String tag;
+    private Long userId;
     private String title;
-    private String imagePath;
+    private String filePath;
+    private String fileType;
+
+
+    @ManyToMany
+    @JoinTable(
+            name = "meme_hashtags",
+            joinColumns = @JoinColumn(name = "meme_id"),
+            inverseJoinColumns = @JoinColumn(name = "hashtag_id")
+    )
+    private List<Hashtag> hashtags;
 
     public Meme() {}
 
-    public Meme(String title, String imagePath) {
-        this.title = title;
-        this.imagePath = imagePath;
-    }
-
     public Long getId() { return id; }
-    public String getTag() { return tag; }
     public String getTitle() { return title; }
-    public String getImagePath() { return imagePath; }
+    public String getFilePath() { return filePath; }
+    public String getFileType() { return fileType; }
+    public List<Hashtag> getHashtags() { return hashtags; }
 
     public void setTitle(String title) { this.title = title; }
-    public void setTag(String tag) { this.tag = tag; }
-    public void setImagePath(String imagePath) { this.imagePath = imagePath; }
+    public void setFilePath(String filePath) { this.filePath = filePath; }
+    public void setFileType(String fileType) { this.fileType = fileType; }
+    public void setHashtags(List<Hashtag> hashtags) { this.hashtags = hashtags; }
 }

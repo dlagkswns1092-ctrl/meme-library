@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Upload Meme</title>
+  <style>
+    .tag-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .tag-badge {
+      background-color: #1da1f2;
+      color: white;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .tag-badge span {
+      font-weight: bold;
+    }
+    .tag-badge .remove {
+      color: white;
+      font-size: 16px;
+      line-height: 1;
+    }
+    #tag-input {
+      padding: 6px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Upload Meme</h2>
+
+<form th:action="@{/memes}" method="post" enctype="multipart/form-data">
+
+  Title: <input type="text" name="title" required/><br/><br/>
+
+  Tags:
+  <div>
+    <input type="text" id="tag-input" placeholder="Type a tag and press Enter"/>
+  </div>
+
+  <div class="tag-container" id="tag-container"></div>
+  <div id="hidden-tags"></div>
+
+  <br/>
+  File: <input type="file" name="file" accept="image/*,video/mp4" required/><br/><br/>
+
+  <button type="submit">Upload</button>
+
+</form>
+
+<br/>
+<a th:href="@{/gallery}">&larr; Back to Gallery</a>
+
+<script>
+  const tagInput = document.getElementById('tag-input');
+  const tagContainer = document.getElementById('tag-container');
+  const hiddenTags = document.getElementById('hidden-tags');
+  const tags = [];
+
+  tagInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+
+      let value = tagInput.value.trim();
+      if (!value) return;
+
+      value = value.replace(/^#+/, '');
+      if (!value || tags.includes(value)) {
+        tagInput.value = '';
+        return;
+      }
+
+      tags.push(value);
+      renderTags();
+      tagInput.value = '';
+    }
+  });
+
+  function renderTags() {
+    tagContainer.innerHTML = '';
+    hiddenTags.innerHTML = '';
+
+    tags.forEach((tag, index) => {
+      const badge = document.createElement('div');
+      badge.className = 'tag-badge';
+      badge.innerHTML = `<span>#${tag}</span><span class="remove" onclick="removeTag(${index})">&times;</span>`;
+      tagContainer.appendChild(badge);
+
+      const hidden = document.createElement('input');
+      hidden.type = 'hidden';
+      hidden.name = 'tags';
+      hidden.value = tag;
+      hiddenTags.appendChild(hidden);
+    });
+  }
+
+  function removeTag(index) {
+    tags.splice(index, 1);
+    renderTags();
+  }
+</script>
+
+</body>
+</html>
