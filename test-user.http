@@ -5,3 +5,13 @@ Content-Type: application/json
   "username": "hyunwook123",
   "password": "1234"
 }
+
+###
+
+POST http://localhost:8080/users
+Content-Type: application/json
+
+{
+  "username": "memetester",
+  "password": "1234"
+}
