@@ -15,6 +15,7 @@ public class Meme {
     private String title;
     private String filePath;
     private String fileType;
+    private int likeCount = 0;
 
 
     @ManyToMany
@@ -31,10 +32,12 @@ public class Meme {
     public String getTitle() { return title; }
     public String getFilePath() { return filePath; }
     public String getFileType() { return fileType; }
-    public List<Hashtag> getHashtags() { return hashtags; }
+    public int getLikeCount() { return likeCount; }
+    public java.util.List<Hashtag> getHashtags() { return hashtags; }
 
     public void setTitle(String title) { this.title = title; }
     public void setFilePath(String filePath) { this.filePath = filePath; }
     public void setFileType(String fileType) { this.fileType = fileType; }
-    public void setHashtags(List<Hashtag> hashtags) { this.hashtags = hashtags; }
+    public void setLikeCount(int likeCount) { this.likeCount = likeCount; }
+    public void setHashtags(java.util.List<Hashtag> hashtags) { this.hashtags = hashtags; }
 }

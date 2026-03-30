@@ -17,8 +17,8 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<?> createUser(@RequestBody User user) {
-        if (userRepository.existsByUsername(user.getUsername())) {
-            return ResponseEntity.badRequest().body("이미 존재하는 username입니다.");
+        if (userRepository.existsByEmail(user.getEmail())) {
+            return ResponseEntity.badRequest().body("이미 존재하는 email입니다.");
         }
 
         User savedUser = userRepository.save(user);

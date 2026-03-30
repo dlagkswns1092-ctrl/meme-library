@@ -12,4 +12,7 @@ public interface MemeRepository extends JpaRepository<Meme, Long> {
 
     @Query("SELECT m FROM Meme m JOIN m.hashtags h WHERE h.tag IN :tags GROUP BY m HAVING COUNT(DISTINCT h.tag) = :tagCount")
     List<Meme> findByAllHashtags(@Param("tags") List<String> tags, @Param("tagCount") long tagCount);
+
+    @Query("SELECT m FROM Meme m ORDER BY m.likeCount DESC")
+    List<Meme> findAllOrderByLikeCountDesc();
 }
