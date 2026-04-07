@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/meme_library
+    url: jdbc:postgresql://localhost:5432/meme_db
     username: postgres
     password: hw040504@@
   security:

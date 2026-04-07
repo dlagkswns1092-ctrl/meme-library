@@ -78,4 +78,9 @@ public class MemeController {
         memeRepository.deleteById(id);
         return "Deleted";
     }
+
+    @GetMapping("/most-liked")
+    public List<Meme> getMostLiked() {
+        return memeRepository.findAllOrderByLikeCountDesc();
+    }
 }
