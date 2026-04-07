@@ -10,11 +10,14 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String username;
+    @Column(name = "auth0_id", nullable = false, unique = true)
+    private String auth0Id;
 
-    @Column(nullable = false)
-    private String password;
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(nullable = false, unique = true)
+    private String nickname;
 
     public User() {}
 
@@ -22,19 +25,27 @@ public class User {
         return id;
     }
 
-    public String getUsername() {
-        return username;
+    public String getAuth0Id() {
+        return auth0Id;
     }
 
-    public String getPassword() {
-        return password;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public String getNickname() {
+        return nickname;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setAuth0Id(String auth0Id) {
+        this.auth0Id = auth0Id;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 }
