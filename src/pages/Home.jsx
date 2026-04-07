@@ -1,59 +1,20 @@
+import { Link } from "react-router-dom";
 import { useState } from "react";
 import Navbar from "../components/Navbar";
-import photo1 from "../../photo/images.jpg";
-import photo2 from "../../photo/images-1.jpg";
-import photo3 from "../../photo/images-2.jpg";
-import photo4 from "../../photo/images-3.jpg";
-import photo5 from "../../photo/download-2.jpg";
-import photo6 from "../../photo/download-3.jpg";
-import photo7 from "../../photo/download-4.jpg";
-import photo8 from "../../photo/download-5.jpg";
+import { recommendedMemes, trendingMemes } from "../memeData";
 
-const trendingMemes = [
-  {
-    id: "trend-1",
-    image: photo1,
-    alt: "인기 밈 이미지 1",
-  },
-  {
-    id: "trend-2",
-    image: photo2,
-    alt: "인기 밈 이미지 2",
-  },
-  {
-    id: "trend-3",
-    image: photo3,
-    alt: "인기 밈 이미지 3",
-  },
-  {
-    id: "trend-4",
-    image: photo4,
-    alt: "인기 밈 이미지 4",
-  },
+const homeFilters = [
+  "Filter",
+  "Filter",
+  "Filter",
+  "Filter",
+  "Filter",
+  "Filter",
+  "Filter",
+  "Filter",
 ];
 
-const recommendedMemes = [
-  {
-    id: "rec-1",
-    image: photo5,
-    alt: "추천 밈 이미지 1",
-  },
-  {
-    id: "rec-2",
-    image: photo6,
-    alt: "추천 밈 이미지 2",
-  },
-  {
-    id: "rec-3",
-    image: photo7,
-    alt: "추천 밈 이미지 3",
-  },
-  {
-    id: "rec-4",
-    image: photo8,
-    alt: "추천 밈 이미지 4",
-  },
-];
+const INITIAL_TRENDING_COUNT = 4;
 
 function HeartIcon() {
   return (
@@ -68,11 +29,30 @@ function HeartIcon() {
   );
 }
 
+function AdjustIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="homeFilterIcon" aria-hidden="true" focusable="false">
+      <path d="M4 7h10" />
+      <path d="M18 7h2" />
+      <path d="M14 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" />
+      <path d="M4 17h2" />
+      <path d="M10 17h10" />
+      <path d="M8 17a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" />
+    </svg>
+  );
+}
+
 function MemeCard({ meme, liked, onToggle }) {
   return (
     <article className="memeCard">
       <div className="thumbBox">
-        <img src={meme.image} alt={meme.alt} className="thumbImage" loading="lazy" />
+        <Link
+          to={`/meme/${meme.id}`}
+          className="memeCardLink"
+          aria-label={`${meme.title} 상세 보기`}
+        >
+          <img src={meme.image} alt={meme.alt} className="thumbImage" loading="lazy" />
+        </Link>
         <button
           type="button"
           className={`heartBtn${liked ? " isLiked" : ""}`}
@@ -89,10 +69,20 @@ function MemeCard({ meme, liked, onToggle }) {
 
 export default function Home() {
   const [likedIds, setLikedIds] = useState([]);
+  const [visibleTrendingCount, setVisibleTrendingCount] = useState(INITIAL_TRENDING_COUNT);
+
+  const visibleTrendingMemes = trendingMemes.slice(0, visibleTrendingCount);
+  const canLoadMoreTrending = visibleTrendingCount < trendingMemes.length;
 
   const toggleLike = (id) => {
     setLikedIds((prev) =>
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  const handleLoadMoreTrending = () => {
+    setVisibleTrendingCount((prev) =>
+      Math.min(prev + INITIAL_TRENDING_COUNT, trendingMemes.length)
     );
   };
 
@@ -106,20 +96,27 @@ export default function Home() {
       </section>
 
       <section className="chipRowWrap">
-        <div className="chipRow leftAligned">
-          <button className="chip chipActive">이미지</button>
-          <button className="chip">GIF</button>
-          <button className="chip">나이</button>
-          <button className="chip">성별</button>
+        <div className="chipRow homeFilterRow">
+          {homeFilters.map((filter, index) => (
+            <button
+              key={`${filter}-${index}`}
+              className={`chip${index < 3 ? " chipActive" : ""}`}
+            >
+              {filter}
+            </button>
+          ))}
+          <button type="button" className="homeFilterAdjustBtn" aria-label="필터 설정">
+            <AdjustIcon />
+          </button>
         </div>
       </section>
 
-      <main className="content homeContent">
-        <section className="section">
+      <main className="homeContent">
+        <section className="section homeSection">
           <h2>인기 급 상승</h2>
 
           <div className="cardGrid">
-            {trendingMemes.map((meme) => (
+            {visibleTrendingMemes.map((meme) => (
               <MemeCard
                 key={meme.id}
                 meme={meme}
@@ -129,13 +126,17 @@ export default function Home() {
             ))}
           </div>
 
-          <div className="moreWrap">
-            <button className="moreBtn">더보기</button>
-          </div>
+          {canLoadMoreTrending && (
+            <div className="moreWrap">
+              <button type="button" className="moreBtn" onClick={handleLoadMoreTrending}>
+                더보기
+              </button>
+            </div>
+          )}
         </section>
 
-        <section className="section">
-          <h2>회원님이 좋아할만한 밈 / 20대 유행중인 밈</h2>
+        <section className="section homeSection homeSectionWithDivider">
+          <h2>회원님이 좋아할만한 밈</h2>
 
           <div className="cardGrid">
             {recommendedMemes.map((meme) => (

@@ -18,10 +18,10 @@ export default function Login() {
 
             <form className="loginFormFigma" onSubmit={handleSubmit}>
               <input
-                type="text"
-                placeholder="아이디"
+                type="email"
+                placeholder="이메일"
                 className="loginInputFigma"
-                autoComplete="username"
+                autoComplete="email"
               />
 
               <input

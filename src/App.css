@@ -3,6 +3,9 @@
   --accent-neon-soft:rgba(207, 255, 176, 0.2);
   --accent-neon-frame:rgba(207, 255, 176, 0.32);
   --accent-line:#d2d2d2;
+  --layout-desktop-width:1180px;
+  --layout-tablet-width:760px;
+  --layout-mobile-width:344px;
 }
 
 /* ===== SIGNUP PAGE ===== */
@@ -504,16 +507,21 @@
 .topbar{
   width:100%;
   height:88px;
+  margin:0;
   display:flex;
   align-items:center;
   justify-content:space-between;
-  padding:0 40px;
+  gap:20px;
+  padding:0 16px;
+  box-sizing:border-box;
 }
 
 .topLeft{
   display:flex;
   align-items:center;
   gap:18px;
+  flex:1;
+  min-width:0;
 }
 
 .logoMark{
@@ -545,13 +553,15 @@
 }
 
 .searchPill{
-  width:210px;
+  width:100%;
+  max-width:none;
   height:38px;
   border:none;
   border-radius:4px;
   background:#f1f1ef;
   display:flex;
   align-items:center;
+  flex:1;
   padding:0 12px;
   gap:8px;
 }
@@ -594,6 +604,7 @@
   align-items:center;
   justify-content:flex-end;
   gap:12px;
+  flex-shrink:0;
 }
 
 .notificationBtn{
@@ -654,15 +665,20 @@
 }
 
 .chipRowWrap{
-  width:min(1180px, calc(100% - 80px));
-  margin:18px auto 20px;
-  padding:0;
+  width:100%;
+  margin:18px 0 20px;
+  padding:0 16px;
+  box-sizing:border-box;
 }
 
 .chipRow{
   display:flex;
   align-items:center;
   gap:12px;
+}
+
+.homeFilterRow{
+  flex-wrap:wrap;
 }
 
 .leftAligned{
@@ -687,12 +703,41 @@
   border-color:#111;
 }
 
-.homeContent{
-  width:min(1180px, calc(100% - 80px));
-  max-width:1180px;
-  margin:0 auto;
-  padding:0 0 80px;
+.homeFilterAdjustBtn{
+  width:36px;
+  height:36px;
+  padding:0;
+  border:none;
+  background:transparent;
+  color:#1f1f1f;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
 }
+
+.homeFilterIcon{
+  width:20px;
+  height:20px;
+}
+
+.homeFilterIcon *{
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.8;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+
+.homeContent{
+  width:100%;
+  max-width:none;
+  margin:0;
+  padding:0 16px 80px;
+  box-sizing:border-box;
+  display:block;
+}
+
 .section{
   margin-top:28px;
 }
@@ -702,6 +747,16 @@
   font-size:18px;
   font-weight:900;
   color:#111;
+}
+
+.homeSection{
+  width:100%;
+}
+
+.homeSectionWithDivider{
+  margin-top:20px;
+  padding-top:34px;
+  border-top:1px solid #e5e5e5;
 }
 
 .cardGrid{
@@ -736,6 +791,18 @@
   pointer-events:none;
 }
 
+.memeCardLink{
+  display:block;
+  width:100%;
+  height:100%;
+}
+
+.memeCardLink:focus-visible{
+  outline:3px solid #c5ff38;
+  outline-offset:-3px;
+  border-radius:30px;
+}
+
 .thumbImage{
   display:block;
   width:100%;
@@ -747,6 +814,7 @@
   position:absolute;
   top:15px;
   right:15px;
+  z-index:2;
   width:25px;
   height:25px;
   padding:0;
@@ -792,21 +860,358 @@
   fill:currentColor;
 }
 
+.memeDetailPage{
+  background:#ffffff;
+}
+
+.memeDetailLayout{
+  width:100%;
+  max-width:none;
+  margin:0;
+  padding:14px 16px 72px;
+  box-sizing:border-box;
+  display:grid;
+  grid-template-columns:minmax(0, 1fr) 260px;
+  gap:28px;
+  align-items:start;
+}
+
+.memeDetailCard{
+  border:1px solid #e8e2d8;
+  border-radius:28px;
+  background:#ffffff;
+  box-shadow:0 14px 32px rgba(17, 17, 17, 0.04);
+  overflow:hidden;
+}
+
+.memeDetailTopRow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  padding:20px 28px 18px;
+}
+
+.memeDetailActionGroup{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  flex-wrap:wrap;
+}
+
+.memeDetailMetaGroup{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-left:auto;
+}
+
+.memeDetailIconBtn{
+  padding:0;
+  border:none;
+  background:transparent;
+  color:#222222;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  font-size:16px;
+  cursor:pointer;
+  transition:transform 0.16s ease, color 0.16s ease;
+}
+
+.memeDetailIconBtn:hover,
+.memeDetailSideHeart:hover{
+  transform:translateY(-1px);
+}
+
+.memeDetailIconBtn.isLiked{
+  color:#b9f85f;
+}
+
+.memeDetailIconBtn.isLiked .memeDetailIcon path{
+  fill:currentColor;
+}
+
+.memeDetailIcon{
+  width:22px;
+  height:22px;
+}
+
+.memeDetailIcon path,
+.memeDetailChevron path,
+.memeDetailSendIcon path,
+.memeDetailSideHeartIcon path{
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.9;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+
+.memeDetailCategoryBtn{
+  height:34px;
+  padding:0 10px;
+  border:none;
+  background:transparent;
+  color:#1f1f1f;
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  font-size:14px;
+  cursor:pointer;
+}
+
+.memeDetailChevron{
+  width:18px;
+  height:18px;
+}
+
+.memeDetailSaveBtn{
+  min-width:48px;
+  height:34px;
+  padding:0 14px;
+  border:none;
+  border-radius:9px;
+  background:#cfff9d;
+  color:#1f1f1f;
+  font-size:14px;
+  font-weight:700;
+  cursor:pointer;
+  transition:background-color 0.16s ease, transform 0.16s ease;
+}
+
+.memeDetailSaveBtn.isSaved{
+  background:#1f1f1f;
+  color:#ffffff;
+}
+
+.memeDetailImageBox{
+  position:relative;
+  margin:0 28px;
+  border-radius:24px;
+  overflow:hidden;
+  background:#f4f1ea;
+  aspect-ratio:1.24;
+}
+
+.memeDetailImage{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.memeDetailBadge{
+  position:absolute;
+  right:18px;
+  bottom:18px;
+  min-width:68px;
+  height:32px;
+  padding:0 14px;
+  border-radius:10px;
+  background:rgba(244, 234, 214, 0.92);
+  color:#333333;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size:17px;
+  font-weight:600;
+}
+
+.memeDetailContent{
+  padding:16px 30px 22px;
+  border-bottom:1px solid #ebe7de;
+}
+
+.memeDetailTitle{
+  margin:0;
+  color:#111111;
+  font-size:18px;
+  font-weight:900;
+  line-height:1.3;
+}
+
+.memeDetailAuthorRow{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-top:14px;
+  color:#9c9c9c;
+  font-size:14px;
+}
+
+.memeDetailAvatar{
+  width:24px;
+  height:24px;
+  border-radius:50%;
+  background:#dddddd;
+  flex-shrink:0;
+}
+
+.memeDetailAuthor{
+  color:#1f1f1f;
+  font-weight:700;
+}
+
+.memeDetailAuthorLink{
+  color:inherit;
+  text-decoration:none;
+}
+
+.memeDetailAuthorLink:hover .memeDetailAuthor{
+  text-decoration:underline;
+  text-underline-offset:3px;
+}
+
+.memeDetailAuthorDot{
+  color:#d0d0d0;
+}
+
+.memeDetailComments{
+  padding:12px 30px 24px;
+}
+
+.memeDetailComments h2{
+  margin:0;
+  color:#1f1f1f;
+  font-size:16px;
+  font-weight:800;
+}
+
+.memeDetailCommentList{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  margin-top:14px;
+}
+
+.memeDetailCommentItem{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+}
+
+.memeDetailCommentCopy{
+  display:flex;
+  align-items:baseline;
+  gap:6px;
+  flex-wrap:wrap;
+  min-width:0;
+}
+
+.memeDetailCommentAuthor{
+  color:#1f1f1f;
+  font-size:14px;
+  font-weight:700;
+}
+
+.memeDetailCommentCopy p{
+  margin:0;
+  color:#626262;
+  font-size:14px;
+}
+
+.memeDetailCommentForm{
+  position:relative;
+  margin-top:18px;
+}
+
+.memeDetailCommentForm input{
+  width:100%;
+  height:46px;
+  padding:0 48px 0 14px;
+  border:1px solid #e1e1e1;
+  border-radius:8px;
+  background:#ffffff;
+  color:#111111;
+  font-size:14px;
+  outline:none;
+}
+
+.memeDetailCommentForm input:focus{
+  border-color:#b7b7b7;
+}
+
+.memeDetailCommentForm button{
+  position:absolute;
+  top:50%;
+  right:12px;
+  width:24px;
+  height:24px;
+  padding:0;
+  border:none;
+  background:transparent;
+  color:#9d9d9d;
+  transform:translateY(-50%);
+  cursor:pointer;
+}
+
+.memeDetailSendIcon{
+  width:20px;
+  height:20px;
+}
+
+.memeDetailSidebar{
+  display:flex;
+  flex-direction:column;
+  gap:28px;
+}
+
+.memeDetailSideCard{
+  position:relative;
+  border-radius:22px;
+  overflow:hidden;
+  background:#f5f2ec;
+  box-shadow:0 12px 28px rgba(17, 17, 17, 0.06);
+}
+
+.memeDetailSideLink{
+  display:block;
+  width:100%;
+  aspect-ratio:1 / 1.04;
+}
+
+.memeDetailSideImage{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.memeDetailSideHeart{
+  position:absolute;
+  top:14px;
+  right:14px;
+  width:26px;
+  height:26px;
+  padding:0;
+  border:none;
+  background:transparent;
+  color:#ffffff;
+  cursor:pointer;
+  transition:transform 0.16s ease, color 0.16s ease;
+}
+
+.memeDetailSideHeart.isLiked{
+  color:#c5ff38;
+}
+
+.memeDetailSideHeart.isLiked .memeDetailSideHeartIcon path{
+  fill:currentColor;
+}
+
+.memeDetailSideHeartIcon{
+  width:24px;
+  height:24px;
+  filter:drop-shadow(0 2px 6px rgba(17, 17, 17, 0.16));
+}
+
 .moreWrap{
   display:flex;
   align-items:center;
   justify-content:center;
   gap:32px;
   margin:54px 0 40px;
-}
-
-.moreWrap::before,
-.moreWrap::after{
-  content:"";
-  flex:1;
-  min-width:0;
-  height:1px;
-  background:var(--accent-line);
 }
 
 .moreBtn{
@@ -826,9 +1231,11 @@
 }
 
 .myPageContent{
-  width:min(1180px, calc(100% - 72px));
-  margin:0 auto;
-  padding:14px 0 72px;
+  width:100%;
+  max-width:none;
+  margin:0;
+  padding:14px 16px 72px;
+  box-sizing:border-box;
 }
 
 .profileHero{
@@ -885,6 +1292,25 @@
   text-decoration:underline;
   text-underline-offset:3px;
   cursor:pointer;
+}
+
+.otherProfileFollowBtn{
+  min-width:58px;
+  height:28px;
+  margin-top:12px;
+  padding:0 14px;
+  border:none;
+  border-radius:8px;
+  background:#ececec;
+  color:#111111;
+  font-size:13px;
+  font-weight:700;
+  cursor:pointer;
+  transition:background-color 0.16s ease, color 0.16s ease;
+}
+
+.otherProfileFollowBtn.isFollowing{
+  background:var(--accent-neon);
 }
 
 .boardSwitch{
@@ -958,6 +1384,57 @@
   border-color:#1c1c1c;
   background:#1c1c1c;
   color:#ffffff;
+}
+
+.otherProfileSectionTitle{
+  margin:28px 0 22px;
+}
+
+.otherProfileSectionTitle h2{
+  margin:0;
+  color:#111111;
+  font-size:18px;
+  font-weight:800;
+}
+
+.otherProfilePrivateState{
+  min-height:420px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  gap:14px;
+}
+
+.otherProfilePrivateState h2{
+  margin:0;
+  color:#111111;
+  font-size:20px;
+  font-weight:800;
+}
+
+.otherProfilePrivateState p{
+  margin:0;
+  color:#9a9a9a;
+  font-size:15px;
+  line-height:1.3;
+}
+
+.otherProfileLockIcon{
+  width:132px;
+  height:132px;
+  color:#3a3a3a;
+}
+
+.otherProfileLockIcon circle,
+.otherProfileLockIcon path,
+.otherProfileLockIcon rect{
+  fill:none;
+  stroke:currentColor;
+  stroke-width:3;
+  stroke-linecap:round;
+  stroke-linejoin:round;
 }
 
 .uploadHeaderRow{
@@ -1129,31 +1606,81 @@
   margin-top:30px;
 }
 
-.uploadTagRow{
-  display:flex;
-  align-items:center;
-  flex-wrap:wrap;
-  gap:16px;
-  margin-top:12px;
+.uploadTagHint{
+  margin-top:8px;
+  color:#8a8a8a;
+  font-size:13px;
+  line-height:1.5;
 }
 
-.uploadTagChip,
-.uploadTagAddBtn{
-  height:46px;
-  padding:0 18px;
+.uploadTagRow{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  margin-top:14px;
+}
+
+.uploadTagChip{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:46px;
+  padding:10px 18px;
   border:1px solid #dddddd;
-  border-radius:12px;
+  border-radius:10px;
   background:#ffffff;
   color:#111111;
   font-size:18px;
+  line-height:1.2;
+}
+
+.uploadTagDirectBtn{
+  min-height:46px;
+  padding:10px 18px;
+  border:none;
+  border-radius:10px;
+  background:#cfff9d;
+  color:#111111;
+  font-size:18px;
+  font-weight:700;
+  line-height:1.2;
   cursor:pointer;
 }
 
+.uploadTagInputRow{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-top:14px;
+}
+
+.uploadTagDirectInput{
+  flex:1;
+  height:46px;
+  padding:0 14px;
+  border:1px solid #dddddd;
+  border-radius:10px;
+  background:#ffffff;
+  color:#111111;
+  font-size:16px;
+  outline:none;
+}
+
+.uploadTagDirectInput:focus{
+  border-color:#b7b7b7;
+}
+
 .uploadTagAddBtn{
-  width:56px;
-  padding:0;
-  font-size:28px;
-  line-height:1;
+  min-width:72px;
+  height:46px;
+  padding:0 16px;
+  border:none;
+  border-radius:10px;
+  background:#1f1f1f;
+  color:#ffffff;
+  font-size:16px;
+  font-weight:700;
+  cursor:pointer;
 }
 
 .uploadSubmitBtn{
@@ -1246,10 +1773,19 @@
   fill:currentColor;
 }
 
-@media (max-width: 1100px){
+@media (max-width: 900px){
+  .topbar,
   .chipRowWrap,
-  .homeContent{
-    width:min(544px, calc(100% - 40px));
+  .homeContent,
+  .myPageContent,
+  .memeDetailLayout{
+    width:100%;
+    max-width:none;
+    margin:0;
+  }
+
+  .homeFilterRow{
+    justify-content:center;
   }
 
   .cardGrid{
@@ -1261,8 +1797,14 @@
     font-size:42px;
   }
 
-  .myPageContent{
-    width:min(760px, calc(100% - 40px));
+  .memeDetailLayout{
+    grid-template-columns:1fr;
+  }
+
+  .memeDetailSidebar{
+    display:grid;
+    grid-template-columns:repeat(3, minmax(0, 1fr));
+    gap:18px;
   }
 
   .uploadEditorLayout{
@@ -1284,14 +1826,20 @@
   }
 }
 
-@media (max-width: 700px){
-  .topbar{
-    padding:0 18px;
-  }
-
+@media (max-width: 640px){
+  .topbar,
   .homeContent,
   .chipRowWrap{
-    width:min(260px, calc(100% - 28px));
+    width:min(var(--layout-mobile-width), calc(100% - 28px));
+  }
+
+  .homeFilterRow{
+    justify-content:flex-start;
+  }
+
+  .memeDetailLayout{
+    width:min(var(--layout-mobile-width), calc(100% - 28px));
+    gap:20px;
   }
 
   .cardGrid{
@@ -1307,8 +1855,38 @@
     width:150px;
   }
 
+  .memeDetailCard{
+    border-radius:24px;
+  }
+
+  .memeDetailTopRow{
+    flex-direction:column;
+    align-items:flex-start;
+    padding:18px 18px 14px;
+  }
+
+  .memeDetailMetaGroup{
+    margin-left:0;
+  }
+
+  .memeDetailImageBox{
+    margin:0 18px;
+    border-radius:20px;
+  }
+
+  .memeDetailContent,
+  .memeDetailComments{
+    padding-left:18px;
+    padding-right:18px;
+  }
+
+  .memeDetailSidebar{
+    grid-template-columns:1fr;
+    gap:20px;
+  }
+
   .myPageContent{
-    width:min(344px, calc(100% - 28px));
+    width:min(var(--layout-mobile-width), calc(100% - 28px));
     padding-bottom:48px;
   }
 
@@ -1358,10 +1936,26 @@
     gap:12px;
   }
 
-  .uploadTagChip,
-  .uploadTagAddBtn{
-    height:42px;
+  .uploadTagChip{
+    min-height:42px;
+    padding:8px 16px;
     font-size:16px;
+  }
+
+  .uploadTagDirectBtn{
+    min-height:42px;
+    padding:8px 16px;
+    font-size:16px;
+  }
+
+  .uploadTagInputRow{
+    flex-direction:column;
+    align-items:stretch;
+  }
+
+  .uploadTagDirectInput,
+  .uploadTagAddBtn{
+    width:100%;
   }
 
   .uploadSubmitBtn{

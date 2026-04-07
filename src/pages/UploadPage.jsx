@@ -21,9 +21,13 @@ const defaultTags = ["학업", "웃긴", "귀여운"];
 
 export default function UploadPage() {
   const inputRef = useRef(null);
+  const tagInputRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [fileName, setFileName] = useState("");
   const [memeName, setMemeName] = useState("");
+  const [customTagInput, setCustomTagInput] = useState("");
+  const [isCustomTagInputOpen, setIsCustomTagInputOpen] = useState(false);
+  const [tags, setTags] = useState(defaultTags);
 
   const handleBrowse = () => {
     inputRef.current?.click();
@@ -58,6 +62,47 @@ export default function UploadPage() {
     }
   };
 
+  const handleSubmit = (event) => {
+    event.preventDefault();
+  };
+
+  const addTag = () => {
+    const nextTag = customTagInput.trim();
+
+    if (!nextTag) {
+      return;
+    }
+
+    const isDuplicate = tags.some(
+      (tag) => tag.toLocaleLowerCase() === nextTag.toLocaleLowerCase()
+    );
+
+    if (isDuplicate) {
+      setCustomTagInput("");
+      return;
+    }
+
+    setTags((prev) => [...prev, nextTag]);
+    setCustomTagInput("");
+  };
+
+  const handleTagKeyDown = (event) => {
+    if (event.key !== "Enter") {
+      return;
+    }
+
+    event.preventDefault();
+    addTag();
+  };
+
+  const handleOpenCustomTagInput = () => {
+    setIsCustomTagInputOpen(true);
+
+    window.requestAnimationFrame(() => {
+      tagInputRef.current?.focus();
+    });
+  };
+
   return (
     <div className="page myPage">
       <Navbar />
@@ -90,7 +135,7 @@ export default function UploadPage() {
             {fileName && <span className="selectedFileName">{fileName}</span>}
           </div>
 
-          <form className="uploadFormPanel">
+          <form className="uploadFormPanel" onSubmit={handleSubmit}>
             <label className="uploadFieldLabel" htmlFor="memeName">
               Meme Name
             </label>
@@ -103,16 +148,40 @@ export default function UploadPage() {
 
             <div className="uploadFieldGroup">
               <span className="uploadFieldLabel">Tag</span>
-              <div className="uploadTagRow">
-                {defaultTags.map((tag) => (
-                  <button key={tag} type="button" className="uploadTagChip">
+              <div className="uploadTagRow" aria-label="태그 목록">
+                {tags.map((tag) => (
+                  <span key={tag} className="uploadTagChip">
                     {tag}
-                  </button>
+                  </span>
                 ))}
-                <button type="button" className="uploadTagAddBtn" aria-label="태그 추가">
-                  +
+
+                <button
+                  type="button"
+                  className="uploadTagDirectBtn"
+                  onClick={handleOpenCustomTagInput}
+                >
+                  직접입력
                 </button>
               </div>
+
+              {isCustomTagInputOpen && (
+                <div className="uploadTagInputRow">
+                  <input
+                    ref={tagInputRef}
+                    type="text"
+                    className="uploadTagDirectInput"
+                    placeholder="추가할 태그를 입력하세요"
+                    value={customTagInput}
+                    onChange={(event) => setCustomTagInput(event.target.value)}
+                    onKeyDown={handleTagKeyDown}
+                  />
+                  <button type="button" className="uploadTagAddBtn" onClick={addTag}>
+                    추가
+                  </button>
+                </div>
+              )}
+
+              <p className="uploadTagHint">원하는 태그를 직접 입력해서 추가할 수 있습니다.</p>
             </div>
 
             <button type="submit" className="uploadSubmitBtn">
