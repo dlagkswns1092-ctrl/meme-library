@@ -1,71 +1,94 @@
 package com.example.meme;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/likes")
+@RequestMapping("/api/likes")
 public class LikeController {
 
     private final LikeRepository likeRepository;
-    private final MemeRepository memeRepository;
     private final UserRepository userRepository;
+    private final MemeRepository memeRepository;
 
-    public LikeController(LikeRepository likeRepository,
-                          MemeRepository memeRepository,
-                          UserRepository userRepository) {
+    public LikeController(LikeRepository likeRepository, UserRepository userRepository, MemeRepository memeRepository) {
         this.likeRepository = likeRepository;
-        this.memeRepository = memeRepository;
         this.userRepository = userRepository;
+        this.memeRepository = memeRepository;
     }
 
-    @PostMapping
-    public ResponseEntity<?> toggleLike(@RequestParam Long userId,
-                                        @RequestParam Long memeId) {
+    @PostMapping("/toggle")
+    public ResponseEntity<?> toggleLike(
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestParam Long memeId
+    ) {
+        String auth0Id = jwt.getSubject();
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findByAuth0Id(auth0Id)
+                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다. 먼저 동기화가 필요합니다."));
+
         Meme meme = memeRepository.findById(memeId)
-                .orElseThrow(() -> new RuntimeException("Meme not found"));
+                .orElseThrow(() -> new RuntimeException("밈을 찾을 수 없습니다."));
 
-        if (likeRepository.existsByUserIdAndMemeId(userId, memeId)) {
-            Like like = likeRepository.findByUserIdAndMemeId(userId, memeId).get();
+        if (likeRepository.existsByUserAndMeme(user, meme)) {
+            Like like = likeRepository.findByUserAndMeme(user, meme)
+                    .orElseThrow(() -> new RuntimeException("좋아요 정보를 찾을 수 없습니다."));
+
             likeRepository.delete(like);
-            meme.setLikeCount(meme.getLikeCount() - 1);
+
+            if (meme.getLikeCount() > 0) {
+                meme.setLikeCount(meme.getLikeCount() - 1);
+            }
             memeRepository.save(meme);
-            return ResponseEntity.ok("unliked");
+
+            return ResponseEntity.ok(Map.of(
+                    "liked", false,
+                    "likeCount", meme.getLikeCount()
+            ));
         } else {
             Like like = new Like();
             like.setUser(user);
             like.setMeme(meme);
             likeRepository.save(like);
+
             meme.setLikeCount(meme.getLikeCount() + 1);
             memeRepository.save(meme);
-            return ResponseEntity.ok("liked");
+
+            return ResponseEntity.ok(Map.of(
+                    "liked", true,
+                    "likeCount", meme.getLikeCount()
+            ));
         }
     }
 
     @GetMapping("/count")
     public ResponseEntity<?> getLikeCount(@RequestParam Long memeId) {
-        long count = likeRepository.countByMemeId(memeId);
-        return ResponseEntity.ok(count);
+        Meme meme = memeRepository.findById(memeId)
+                .orElseThrow(() -> new RuntimeException("밈을 찾을 수 없습니다."));
+
+        long count = likeRepository.countByMeme(meme);
+        return ResponseEntity.ok(Map.of("likeCount", count));
     }
 
-    @GetMapping("/check")
-    public ResponseEntity<?> checkLike(@RequestParam Long userId,
-                                       @RequestParam Long memeId) {
-        boolean liked = likeRepository.existsByUserIdAndMemeId(userId, memeId);
-        return ResponseEntity.ok(liked);
-    }
+    @GetMapping("/my")
+    public ResponseEntity<?> getMyLikedMemes(@AuthenticationPrincipal Jwt jwt) {
+        String auth0Id = jwt.getSubject();
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<?> getLikedMemes(@PathVariable Long userId) {
-        if (!userRepository.existsById(userId)) {
-            return ResponseEntity.notFound().build();
-        }
-        List<Meme> likedMemes = likeRepository.findLikedMemesByUserId(userId);
+        User user = userRepository.findByAuth0Id(auth0Id)
+                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다. 먼저 동기화가 필요합니다."));
+
+        List<Like> likes = likeRepository.findByUser(user);
+
+        List<Meme> likedMemes = likes.stream()
+                .map(Like::getMeme)
+                .collect(Collectors.toList());
+
         return ResponseEntity.ok(likedMemes);
     }
 }

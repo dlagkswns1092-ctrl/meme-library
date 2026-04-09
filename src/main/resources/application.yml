@@ -1,21 +1,14 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/meme_db
+    url: jdbc:postgresql://localhost:5432/meme_library
     username: postgres
     password: hw040504@@
+
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: https://dev-n6lgjqpsv3qu74s0.us.auth0.com/
-
-auth0:
-  audience: https://meme-backend-api
-
-  mvc:
-    hiddenmethod:
-      filter:
-        enabled: true
 
   jpa:
     hibernate:
@@ -25,5 +18,13 @@ auth0:
       hibernate:
         format_sql: true
 
-  server:
-    port: 8080
+auth0:
+  audience: https://meme-backend-api
+
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
+
+server:
+  port: 8080
