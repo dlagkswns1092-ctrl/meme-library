@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/meme_library
     username: postgres
-    password: hw040504@@
+    password: ${DB_PASSWORD}
 
   security:
     oauth2:
