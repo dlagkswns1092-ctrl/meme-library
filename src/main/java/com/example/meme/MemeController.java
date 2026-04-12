@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.web.servlet.view.RedirectView;
+import org.springframework.http.ResponseEntity;
 
 @RestController
 @RequestMapping("/memes")
@@ -24,11 +25,26 @@ public class MemeController {
     }
 
     @PostMapping
-    public RedirectView createMeme(
+    public ResponseEntity<?> createMeme(
             @RequestParam("title") String title,
-            @RequestParam("tags") List<String> tags,
-            @RequestParam("file") MultipartFile file
+            @RequestParam("mediaType") String mediaType,
+            @RequestParam("ageGroups") List<String> ageGroups,
+            @RequestParam(value = "tags", required = false) List<String> freeTags,
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("userId") Long userId
     ) throws IOException {
+
+        List<String> validMediaTypes = List.of("이미지", "gif");
+        if (!validMediaTypes.contains(mediaType)) {
+            return ResponseEntity.badRequest().body("mediaType은 이미지 또는 gif 중 하나여야 합니다.");
+        }
+
+        List<String> validAgeGroups = List.of("10대", "20대", "30대");
+        for (String age : ageGroups) {
+            if (!validAgeGroups.contains(age)) {
+                return ResponseEntity.badRequest().body("ageGroup은 10대, 20대, 30대 중에서만 선택 가능합니다.");
+            }
+        }
 
         String uploadDir = "uploads/";
         String fileName = file.getOriginalFilename();
@@ -38,13 +54,19 @@ public class MemeController {
         Files.createDirectories(filePath.getParent());
         Files.write(filePath, file.getBytes());
 
-        List<Hashtag> hashtags = tags.stream()
+        List<String> allTags = new java.util.ArrayList<>();
+        allTags.add(mediaType);
+        allTags.addAll(ageGroups);
+        if (freeTags != null) allTags.addAll(freeTags);
+
+        List<Hashtag> hashtags = allTags.stream()
                 .map(String::trim)
                 .filter(t -> !t.isEmpty())
                 .map(tagName -> hashtagRepository.findByTag(tagName)
                         .orElseGet(() -> {
                             Hashtag h = new Hashtag();
                             h.setTag(tagName);
+                            h.setTagType(TagType.FREE);
                             return hashtagRepository.save(h);
                         }))
                 .collect(Collectors.toList());
@@ -57,13 +79,13 @@ public class MemeController {
 
         memeRepository.save(meme);
 
-        return new RedirectView("/gallery");
+        return ResponseEntity.ok("업로드 성공");
     }
 
     @GetMapping
     public List<Meme> getAllMemes(@RequestParam(required = false) List<String> tags) {
         if (tags != null && !tags.isEmpty()) {
-            return memeRepository.findByAllHashtags(tags, tags.size());  // ✅ findByTag → findByAllHashtags
+            return memeRepository.findByAllHashtags(tags, tags.size());
         }
         return memeRepository.findAll();
     }
@@ -72,7 +94,7 @@ public class MemeController {
     public String deleteMeme(@PathVariable Long id) throws IOException {
         Meme meme = memeRepository.findById(id).orElseThrow();
 
-        Path filePath = Paths.get("uploads/" + meme.getFilePath());  // ✅ getImagePath → getFilePath
+        Path filePath = Paths.get("uploads/" + meme.getFilePath());
         Files.deleteIfExists(filePath);
 
         memeRepository.deleteById(id);
