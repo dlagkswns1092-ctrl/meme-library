@@ -76,6 +76,7 @@ public class MemeController {
         meme.setFilePath(fileName);
         meme.setFileType(fileType);
         meme.setHashtags(hashtags);
+        meme.setUserId(userId);
 
         memeRepository.save(meme);
 
