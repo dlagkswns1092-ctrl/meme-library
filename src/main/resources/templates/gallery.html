@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Meme Gallery</title>
+    <style>
+        .tag-btn {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 2px solid #1da1f2;
+            color: #1da1f2;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            margin: 2px;
+        }
+        .tag-btn.active {
+            background-color: #1da1f2;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Meme Gallery</h2>
+
+
+<a href="/upload">&rarr; Upload Meme</a>
+<hr>
+
+<div id="tag-filter">
+    <a class="tag-btn"
+       th:classappend="${#lists.isEmpty(currentTags)} ? 'active'"
+       href="/gallery">All</a>
+
+    <span th:each="tag : ${distinctTags}">
+        <a class="tag-btn"
+           th:classappend="${currentTags != null and currentTags.contains(tag)} ? 'active'"
+           th:text="${tag}"
+           th:data-tag="${tag}"
+           href="#"
+           onclick="toggleTag(this)">
+        </a>
+    </span>
+</div>
+
+<p th:if="${currentTags != null and !#lists.isEmpty(currentTags)}"
+   th:text="'Showing: #' + ${#strings.listJoin(currentTags, ' #')}"></p>
+
+<div th:each="meme : ${memes}">
+    <h3 th:text="${meme.title}"></h3>
+    <span th:each="hashtag : ${meme.hashtags}" th:text="'#' + ${hashtag.tag} + ' '"></span>
+
+    <img th:if="${meme.fileType == 'image'}"
+         th:src="@{'/uploads/' + ${meme.filePath}}"
+         width="300"/>
+
+    <video th:if="${meme.fileType == 'mp4'}" width="300" controls>
+        <source th:src="@{'/uploads/' + ${meme.filePath}}" type="video/mp4"/>
+    </video>
+
+    <br/>
+    <form th:action="@{'/memes/' + ${meme.id}}" method="post" style="display:inline;">
+        <input type="hidden" name="_method" value="delete"/>
+        <button type="submit">Delete</button>
+    </form>
+
+    <a th:href="@{'/uploads/' + ${meme.filePath}}"
+       th:download="${meme.filePath}">
+        <button type="button">Download</button>
+    </a>
+
+    <hr>
+</div>
+
+<script th:inline="javascript">
+    const currentTags = /*[[${currentTags}]]*/ [];
+
+    function toggleTag(el) {
+        const tag = el.getAttribute('data-tag');
+        let tags = currentTags ? [...currentTags] : [];
+
+        if (tags.includes(tag)) {
+            tags = tags.filter(t => t !== tag);
+        } else {
+            tags.push(tag);
+        }
+
+        if (tags.length === 0) {
+            window.location.href = '/gallery';
+        } else {
+            const query = tags.map(t => 'tags=' + encodeURIComponent(t)).join('&');
+            window.location.href = '/gallery?' + query;
+        }
+    }
+</script>
+
+</body>
+</html>
