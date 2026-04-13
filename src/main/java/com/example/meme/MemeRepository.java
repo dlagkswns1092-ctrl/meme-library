@@ -15,4 +15,6 @@ public interface MemeRepository extends JpaRepository<Meme, Long> {
 
     @Query("SELECT m FROM Meme m ORDER BY m.likeCount DESC")
     List<Meme> findAllOrderByLikeCountDesc();
+
+    List<Meme> findByUserId(Long userId);
 }

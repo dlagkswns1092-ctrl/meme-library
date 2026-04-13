@@ -1,8 +1,10 @@
 package com.example.meme;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.util.List;
 
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
 @Table(name = "memes")
 public class Meme {
@@ -40,4 +42,5 @@ public class Meme {
     public void setFileType(String fileType) { this.fileType = fileType; }
     public void setLikeCount(int likeCount) { this.likeCount = likeCount; }
     public void setHashtags(java.util.List<Hashtag> hashtags) { this.hashtags = hashtags; }
+    public void setUserId(Long userId) { this.userId = userId; }
 }

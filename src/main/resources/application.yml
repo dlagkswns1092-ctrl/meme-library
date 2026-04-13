@@ -18,13 +18,18 @@ spring:
       hibernate:
         format_sql: true
 
-auth0:
-  audience: https://meme-backend-api
+  servlet:
+    multipart:
+      max-file-size: 25MB
+      max-request-size: 25MB
 
   mvc:
     hiddenmethod:
       filter:
         enabled: true
+
+auth0:
+  audience: https://meme-backend-api
 
 server:
   port: 8080
