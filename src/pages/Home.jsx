@@ -1,18 +1,8 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import { recommendedMemes, trendingMemes } from "../memeData";
-
-const homeFilters = [
-  "Filter",
-  "Filter",
-  "Filter",
-  "Filter",
-  "Filter",
-  "Filter",
-  "Filter",
-  "Filter",
-];
+import { FIXED_MEME_TAGS } from "../tagData";
 
 const INITIAL_TRENDING_COUNT = 4;
 
@@ -69,10 +59,21 @@ function MemeCard({ meme, liked, onToggle }) {
 
 export default function Home() {
   const [likedIds, setLikedIds] = useState([]);
+  const [selectedFilters, setSelectedFilters] = useState([]);
   const [visibleTrendingCount, setVisibleTrendingCount] = useState(INITIAL_TRENDING_COUNT);
 
-  const visibleTrendingMemes = trendingMemes.slice(0, visibleTrendingCount);
-  const canLoadMoreTrending = visibleTrendingCount < trendingMemes.length;
+  const matchesSelectedFilters = (meme) =>
+    selectedFilters.length === 0 ||
+    selectedFilters.some((tag) => meme.fixedTags?.includes(tag));
+
+  const filteredTrendingMemes = trendingMemes.filter(matchesSelectedFilters);
+  const filteredRecommendedMemes = recommendedMemes.filter(matchesSelectedFilters);
+  const visibleTrendingMemes = filteredTrendingMemes.slice(0, visibleTrendingCount);
+  const canLoadMoreTrending = visibleTrendingCount < filteredTrendingMemes.length;
+
+  useEffect(() => {
+    setVisibleTrendingCount(INITIAL_TRENDING_COUNT);
+  }, [selectedFilters]);
 
   const toggleLike = (id) => {
     setLikedIds((prev) =>
@@ -80,9 +81,15 @@ export default function Home() {
     );
   };
 
+  const toggleFilter = (tag) => {
+    setSelectedFilters((prev) =>
+      prev.includes(tag) ? prev.filter((item) => item !== tag) : [...prev, tag]
+    );
+  };
+
   const handleLoadMoreTrending = () => {
     setVisibleTrendingCount((prev) =>
-      Math.min(prev + INITIAL_TRENDING_COUNT, trendingMemes.length)
+      Math.min(prev + INITIAL_TRENDING_COUNT, filteredTrendingMemes.length)
     );
   };
 
@@ -97,10 +104,13 @@ export default function Home() {
 
       <section className="chipRowWrap">
         <div className="chipRow homeFilterRow">
-          {homeFilters.map((filter, index) => (
+          {FIXED_MEME_TAGS.map((filter) => (
             <button
-              key={`${filter}-${index}`}
-              className={`chip${index < 3 ? " chipActive" : ""}`}
+              key={filter}
+              type="button"
+              className={`chip${selectedFilters.includes(filter) ? " chipActive" : ""}`}
+              onClick={() => toggleFilter(filter)}
+              aria-pressed={selectedFilters.includes(filter)}
             >
               {filter}
             </button>
@@ -126,7 +136,11 @@ export default function Home() {
             ))}
           </div>
 
-          {canLoadMoreTrending && (
+          {visibleTrendingMemes.length === 0 && (
+            <p className="homeEmptyState">선택한 태그에 맞는 밈이 아직 없어요.</p>
+          )}
+
+          {canLoadMoreTrending && visibleTrendingMemes.length > 0 && (
             <div className="moreWrap">
               <button type="button" className="moreBtn" onClick={handleLoadMoreTrending}>
                 더보기
@@ -139,7 +153,7 @@ export default function Home() {
           <h2>회원님이 좋아할만한 밈</h2>
 
           <div className="cardGrid">
-            {recommendedMemes.map((meme) => (
+            {filteredRecommendedMemes.map((meme) => (
               <MemeCard
                 key={meme.id}
                 meme={meme}
@@ -148,6 +162,10 @@ export default function Home() {
               />
             ))}
           </div>
+
+          {filteredRecommendedMemes.length === 0 && (
+            <p className="homeEmptyState">추천 밈도 선택한 태그 기준으로 비어 있어요.</p>
+          )}
         </section>
       </main>
     </div>

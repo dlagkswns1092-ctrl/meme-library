@@ -1,5 +1,6 @@
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useState } from "react";
+import { CURRENT_USER_PROFILE_ID, useAuth } from "../auth/AuthContext";
 import Navbar from "../components/Navbar";
 import { getMemeById, userProfileMap } from "../memeData";
 
@@ -66,9 +67,21 @@ export default function UserProfile() {
   const { userId } = useParams();
   const [searchParams] = useSearchParams();
   const [likedIds, setLikedIds] = useState([]);
-  const profile = userProfileMap[userId] ?? userProfileMap["min-public"];
+  const { displayName, isProfilePrivate, savedMemeCount, savedMemeIds } = useAuth();
+  const baseProfile = userProfileMap[userId] ?? userProfileMap["min-public"];
+  const profile =
+    userId === CURRENT_USER_PROFILE_ID
+      ? {
+          ...baseProfile,
+          name: displayName || baseProfile.name,
+          isPrivate: isProfilePrivate,
+          savedCount: savedMemeCount,
+          savedMemeIds,
+        }
+      : baseProfile;
   const [isFollowing, setIsFollowing] = useState(profile.isFollowing);
   const activeBoard = searchParams.get("tab") === "upload" ? "upload" : "saved";
+  const isSavedBoardPrivate = activeBoard === "saved" && profile.isPrivate;
 
   const visibleMemes =
     activeBoard === "upload"
@@ -133,11 +146,10 @@ export default function UserProfile() {
           </div>
         </section>
 
-        {profile.isPrivate ? (
+        {isSavedBoardPrivate ? (
           <section className="otherProfilePrivateState">
             <LockIcon />
-            <h2>This account is private</h2>
-            <p>Follow this profile to see their photos and videos</p>
+            <h2>이 계정은 비공개 입니다</h2>
           </section>
         ) : (
           <>

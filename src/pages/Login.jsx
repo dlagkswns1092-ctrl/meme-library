@@ -1,8 +1,21 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../auth/AuthContext";
 
 export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { login } = useAuth();
+  const redirectPath =
+    typeof location.state?.from === "string" ? location.state.from : "/mypage";
+
   const handleSubmit = (event) => {
     event.preventDefault();
+    login({ email });
+    setPassword("");
+    navigate(redirectPath, { replace: true });
   };
 
   return (
@@ -22,6 +35,9 @@ export default function Login() {
                 placeholder="이메일"
                 className="loginInputFigma"
                 autoComplete="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                required
               />
 
               <input
@@ -29,6 +45,9 @@ export default function Login() {
                 placeholder="비밀번호"
                 className="loginInputFigma"
                 autoComplete="current-password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                required
               />
 
               <div className="loginOptionsRow">

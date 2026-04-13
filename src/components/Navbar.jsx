@@ -1,4 +1,5 @@
 import { NavLink, useLocation } from "react-router-dom";
+import { useAuth } from "../auth/AuthContext";
 
 function SearchIcon() {
   return (
@@ -9,18 +10,9 @@ function SearchIcon() {
   );
 }
 
-function BellIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="navIcon bellIcon" aria-hidden="true" focusable="false">
-      <path d="M8 17.5h8" />
-      <path d="M9 18a3 3 0 0 0 6 0" />
-      <path d="M18 16V11a6 6 0 1 0-12 0v5l-1.2 1.6h14.4Z" />
-    </svg>
-  );
-}
-
 export default function Navbar() {
   const location = useLocation();
+  const { isLoggedIn, displayName } = useAuth();
 
   const isAuthPage =
     location.pathname === "/login" || location.pathname === "/signup";
@@ -43,16 +35,13 @@ export default function Navbar() {
 
       {!isAuthPage && (
         <div className="topRight">
-          <button type="button" className="notificationBtn" aria-label="알림">
-            <BellIcon />
-          </button>
           <NavLink
-            to="/mypage"
+            to={isLoggedIn ? "/mypage" : "/login"}
             className={({ isActive }) =>
               `profileLink${isActive ? " profileLinkActive" : ""}`
             }
           >
-            홍지우님
+            {isLoggedIn ? `${displayName}님` : "로그인"}
           </NavLink>
         </div>
       )}

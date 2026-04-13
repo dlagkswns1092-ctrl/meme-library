@@ -607,19 +607,6 @@
   flex-shrink:0;
 }
 
-.notificationBtn{
-  width:28px;
-  height:28px;
-  padding:0;
-  border:none;
-  background:transparent;
-  color:#111111;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-}
-
 .profileLink{
   min-width:84px;
   height:34px;
@@ -665,9 +652,9 @@
 }
 
 .chipRowWrap{
-  width:100%;
-  margin:18px 0 20px;
-  padding:0 16px;
+  width:min(1169px, calc(100% - 32px));
+  margin:18px auto 20px;
+  padding:0;
   box-sizing:border-box;
 }
 
@@ -678,6 +665,8 @@
 }
 
 .homeFilterRow{
+  width:100%;
+  justify-content:flex-start;
   flex-wrap:wrap;
 }
 
@@ -730,10 +719,10 @@
 }
 
 .homeContent{
-  width:100%;
+  width:min(1169px, calc(100% - 32px));
   max-width:none;
-  margin:0;
-  padding:0 16px 80px;
+  margin:0 auto;
+  padding:0 0 80px;
   box-sizing:border-box;
   display:block;
 }
@@ -759,11 +748,17 @@
   border-top:1px solid #e5e5e5;
 }
 
+.homeEmptyState{
+  margin:20px 0 0;
+  color:#787878;
+  font-size:15px;
+}
+
 .cardGrid{
   display:grid;
   grid-template-columns:repeat(4, 260px);
-  justify-content:space-between;
-  gap:34px 24px;
+  justify-content:flex-start;
+  gap:51px 43px;
 }
 
 .memeCard{
@@ -865,14 +860,15 @@
 }
 
 .memeDetailLayout{
-  width:100%;
+  width:min(928px, calc(100% - 32px));
   max-width:none;
-  margin:0;
-  padding:14px 16px 72px;
+  margin:0 auto;
+  padding:14px 0 72px;
   box-sizing:border-box;
   display:grid;
-  grid-template-columns:minmax(0, 1fr) 260px;
-  gap:28px;
+  grid-template-columns:minmax(0, 636px) 260px;
+  justify-content:center;
+  gap:32px;
   align-items:start;
 }
 
@@ -902,7 +898,7 @@
 .memeDetailMetaGroup{
   display:flex;
   align-items:center;
-  gap:10px;
+  gap:0;
   margin-left:auto;
 }
 
@@ -948,24 +944,6 @@
   stroke-linejoin:round;
 }
 
-.memeDetailCategoryBtn{
-  height:34px;
-  padding:0 10px;
-  border:none;
-  background:transparent;
-  color:#1f1f1f;
-  display:inline-flex;
-  align-items:center;
-  gap:5px;
-  font-size:14px;
-  cursor:pointer;
-}
-
-.memeDetailChevron{
-  width:18px;
-  height:18px;
-}
-
 .memeDetailSaveBtn{
   min-width:48px;
   height:34px;
@@ -987,18 +965,22 @@
 
 .memeDetailImageBox{
   position:relative;
-  margin:0 28px;
+  margin:0 24px;
+  height:min(48vh, 520px);
+  padding:12px;
   border-radius:24px;
   overflow:hidden;
-  background:#f4f1ea;
-  aspect-ratio:1.24;
+  background:#ffffff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 
 .memeDetailImage{
   display:block;
   width:100%;
   height:100%;
-  object-fit:cover;
+  object-fit:contain;
 }
 
 .memeDetailBadge{
@@ -1231,10 +1213,10 @@
 }
 
 .myPageContent{
-  width:100%;
+  width:min(1169px, calc(100% - 32px));
   max-width:none;
-  margin:0;
-  padding:14px 16px 72px;
+  margin:0 auto;
+  padding:14px 0 72px;
   box-sizing:border-box;
 }
 
@@ -1267,6 +1249,36 @@
   font-size:23px;
   font-weight:800;
   letter-spacing:-0.02em;
+}
+
+.profileHeadingRow{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.profileLogoutBtn{
+  height:30px;
+  padding:0 12px;
+  border:1px solid #d8d8d8;
+  border-radius:999px;
+  background:#ffffff;
+  color:#1f1f1f;
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+  transition:transform 0.16s ease, background-color 0.16s ease, color 0.16s ease;
+}
+
+.profileLogoutBtn:hover{
+  transform:translateY(-1px);
+  background:#1f1f1f;
+  color:#ffffff;
+}
+
+.profileLogoutBtn:active{
+  transform:translateY(0);
 }
 
 .profileMeta{
@@ -1313,11 +1325,19 @@
   background:var(--accent-neon);
 }
 
+.profileBoardPanel{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:12px;
+  margin-left:auto;
+}
+
 .boardSwitch{
   display:flex;
   align-items:flex-start;
+  flex-wrap:wrap;
   gap:18px;
-  margin-left:auto;
 }
 
 .boardSwitchBtn{
@@ -1360,6 +1380,39 @@
   font-weight:500;
 }
 
+.profileVisibilityRow{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+}
+
+.profileVisibilityBtn{
+  min-width:74px;
+  height:32px;
+  padding:0 14px;
+  border:1px solid #d9d9d9;
+  border-radius:999px;
+  background:#ffffff;
+  color:#222222;
+  font-size:13px;
+  font-weight:700;
+  cursor:pointer;
+  transition:transform 0.16s ease, background-color 0.16s ease, color 0.16s ease,
+    border-color 0.16s ease;
+}
+
+.profileVisibilityBtn:hover{
+  transform:translateY(-1px);
+}
+
+.profileVisibilityBtn.isActive{
+  border-color:#111111;
+  background:#111111;
+  color:#ffffff;
+}
+
 .myFilterRow{
   display:flex;
   align-items:center;
@@ -1384,6 +1437,12 @@
   border-color:#1c1c1c;
   background:#1c1c1c;
   color:#ffffff;
+}
+
+.myBoardEmptyState{
+  margin:20px 0 0;
+  color:#8a8a8a;
+  font-size:15px;
 }
 
 .otherProfileSectionTitle{
@@ -1412,13 +1471,6 @@
   color:#111111;
   font-size:20px;
   font-weight:800;
-}
-
-.otherProfilePrivateState p{
-  margin:0;
-  color:#9a9a9a;
-  font-size:15px;
-  line-height:1.3;
 }
 
 .otherProfileLockIcon{
@@ -1613,6 +1665,10 @@
   line-height:1.5;
 }
 
+.uploadTagHint.isError{
+  color:#d14b4b;
+}
+
 .uploadTagRow{
   display:flex;
   flex-wrap:wrap;
@@ -1632,19 +1688,29 @@
   color:#111111;
   font-size:18px;
   line-height:1.2;
+  cursor:pointer;
+  transition:background-color 0.16s ease, color 0.16s ease, border-color 0.16s ease,
+    transform 0.16s ease;
 }
 
-.uploadTagDirectBtn{
-  min-height:46px;
-  padding:10px 18px;
-  border:none;
-  border-radius:10px;
-  background:#cfff9d;
-  color:#111111;
-  font-size:18px;
-  font-weight:700;
-  line-height:1.2;
-  cursor:pointer;
+.uploadTagChip:hover{
+  transform:translateY(-1px);
+}
+
+.uploadTagChip.isSelected{
+  border-color:#1f1f1f;
+  background:#1f1f1f;
+  color:#ffffff;
+}
+
+.uploadTagChip.isCustomTag{
+  cursor:default;
+  border-color:#cfff9d;
+  background:#f6ffe9;
+}
+
+.uploadTagChip.isCustomTag:hover{
+  transform:none;
 }
 
 .uploadTagInputRow{
@@ -1668,6 +1734,10 @@
 
 .uploadTagDirectInput:focus{
   border-color:#b7b7b7;
+}
+
+.uploadCustomTagRow{
+  margin-top:12px;
 }
 
 .uploadTagAddBtn{
@@ -1699,8 +1769,8 @@
 .myMemeGrid{
   display:grid;
   grid-template-columns:repeat(4, 260px);
-  justify-content:space-between;
-  gap:34px 24px;
+  justify-content:flex-start;
+  gap:51px 43px;
 }
 
 .profileMemeCard{
@@ -1775,22 +1845,28 @@
 
 @media (max-width: 900px){
   .topbar,
-  .chipRowWrap,
-  .homeContent,
-  .myPageContent,
   .memeDetailLayout{
     width:100%;
     max-width:none;
     margin:0;
   }
 
+  .myPageContent{
+    width:min(563px, calc(100% - 32px));
+  }
+
+  .chipRowWrap,
+  .homeContent{
+    width:min(563px, calc(100% - 32px));
+  }
+
   .homeFilterRow{
-    justify-content:center;
+    justify-content:flex-start;
   }
 
   .cardGrid{
     grid-template-columns:repeat(2, 260px);
-    justify-content:center;
+    justify-content:flex-start;
   }
 
   .hero h1{
@@ -1822,7 +1898,7 @@
   }
 
   .myMemeGrid{
-    justify-content:center;
+    justify-content:flex-start;
   }
 }
 
@@ -1844,7 +1920,7 @@
 
   .cardGrid{
     grid-template-columns:260px;
-    justify-content:center;
+    justify-content:flex-start;
   }
 
   .hero h1{
@@ -1900,14 +1976,22 @@
     align-items:flex-start;
   }
 
+  .profileBoardPanel{
+    width:100%;
+    align-items:stretch;
+  }
+
   .boardSwitch{
     width:100%;
-    margin-left:0;
   }
 
   .boardSwitchBtn{
     flex:1;
     min-width:0;
+  }
+
+  .profileVisibilityRow{
+    justify-content:flex-start;
   }
 
   .uploadHeaderRow{
@@ -1963,9 +2047,9 @@
   }
 
   .myMemeGrid{
-    grid-template-columns:repeat(2, 260px);
-    justify-content:center;
-    gap:24px;
+    grid-template-columns:260px;
+    justify-content:flex-start;
+    gap:20px;
   }
 }
 
@@ -1995,9 +2079,18 @@
     width:100%;
   }
 
+  .profileVisibilityRow{
+    flex-direction:column;
+    align-items:stretch;
+  }
+
+  .profileVisibilityBtn{
+    width:100%;
+  }
+
   .myMemeGrid{
     grid-template-columns:260px;
-    justify-content:center;
+    justify-content:flex-start;
     gap:20px;
   }
 }

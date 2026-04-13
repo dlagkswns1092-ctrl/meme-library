@@ -1,16 +1,12 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { useState } from "react";
+import { useAuth } from "../auth/AuthContext";
 import Navbar from "../components/Navbar";
 import MyPageHero from "../components/MyPageHero";
+import { getMemeById } from "../memeData";
 import photo1 from "../../photo/images.jpg";
 
 const boardFilters = ["모든 밈", "귀여운 밈", "욕", "학교", "연애"];
-
-const savedMemes = Array.from({ length: 12 }, (_, index) => ({
-  id: `saved-${index + 1}`,
-  image: photo1,
-  alt: `저장된 밈 ${index + 1}`,
-}));
 
 const uploadedMemes = Array.from({ length: 12 }, (_, index) => ({
   id: `upload-${index + 1}`,
@@ -74,7 +70,9 @@ export default function MyPage() {
   const [searchParams] = useSearchParams();
   const [activeFilter, setActiveFilter] = useState(boardFilters[0]);
   const [likedIds, setLikedIds] = useState([]);
+  const { savedMemeIds, savedMemeCount } = useAuth();
   const activeBoard = searchParams.get("tab") === "upload" ? "upload" : "saved";
+  const savedMemes = savedMemeIds.map(getMemeById).filter(Boolean);
 
   const toggleLike = (id) => {
     setLikedIds((prev) =>
@@ -87,7 +85,11 @@ export default function MyPage() {
       <Navbar />
 
       <main className="myPageContent">
-        <MyPageHero activeBoard={activeBoard} />
+        <MyPageHero
+          activeBoard={activeBoard}
+          savedCount={savedMemeCount}
+          uploadCount={uploadedMemes.length}
+        />
 
         {activeBoard === "saved" ? (
           <>
@@ -105,16 +107,20 @@ export default function MyPage() {
             </section>
 
             <section className="myMemeGrid">
-              {savedMemes.map((meme, index) => (
+              {savedMemes.map((meme) => (
                 <ProfileMemeCard
                   key={meme.id}
                   meme={meme}
                   liked={likedIds.includes(meme.id)}
                   onToggle={toggleLike}
-                  selected={index === 10}
+                  selected={false}
                 />
               ))}
             </section>
+
+            {savedMemes.length === 0 && (
+              <p className="myBoardEmptyState">저장한 밈이 아직 없어요. 상세 페이지에서 저장해보세요.</p>
+            )}
           </>
         ) : (
           <>

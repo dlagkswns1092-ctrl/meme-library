@@ -6,6 +6,7 @@ import MyPage from "./pages/MyPage";
 import Signup from "./pages/Signup";
 import UploadPage from "./pages/UploadPage";
 import UserProfile from "./pages/UserProfile";
+import ProtectedRoute from "./components/ProtectedRoute";
 import "./App.css";
 
 export default function App() {
@@ -14,8 +15,22 @@ export default function App() {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/meme/:memeId" element={<MemeDetail />} />
-      <Route path="/mypage" element={<MyPage />} />
-      <Route path="/mypage/upload" element={<UploadPage />} />
+      <Route
+        path="/mypage"
+        element={
+          <ProtectedRoute>
+            <MyPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/mypage/upload"
+        element={
+          <ProtectedRoute>
+            <UploadPage />
+          </ProtectedRoute>
+        }
+      />
       <Route path="/users/:userId" element={<UserProfile />} />
       <Route path="/signup" element={<Signup />} />
     </Routes>

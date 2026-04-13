@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import Navbar from "../components/Navbar";
 import MyPageHero from "../components/MyPageHero";
+import { FIXED_MEME_TAGS, sanitizeKoreanTagInput } from "../tagData";
 
 function UploadArrowIcon() {
   return (
@@ -17,17 +18,15 @@ function UploadArrowIcon() {
   );
 }
 
-const defaultTags = ["학업", "웃긴", "귀여운"];
-
 export default function UploadPage() {
   const inputRef = useRef(null);
-  const tagInputRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [fileName, setFileName] = useState("");
   const [memeName, setMemeName] = useState("");
   const [customTagInput, setCustomTagInput] = useState("");
-  const [isCustomTagInputOpen, setIsCustomTagInputOpen] = useState(false);
-  const [tags, setTags] = useState(defaultTags);
+  const [selectedFixedTags, setSelectedFixedTags] = useState([]);
+  const [customTags, setCustomTags] = useState([]);
+  const [tagFeedback, setTagFeedback] = useState("");
 
   const handleBrowse = () => {
     inputRef.current?.click();
@@ -66,6 +65,22 @@ export default function UploadPage() {
     event.preventDefault();
   };
 
+  const toggleFixedTag = (tag) => {
+    setSelectedFixedTags((prev) =>
+      prev.includes(tag) ? prev.filter((item) => item !== tag) : [...prev, tag]
+    );
+  };
+
+  const handleCustomTagInputChange = (event) => {
+    const nextValue = event.target.value;
+    const sanitizedValue = sanitizeKoreanTagInput(nextValue);
+
+    setCustomTagInput(sanitizedValue);
+    setTagFeedback(
+      nextValue === sanitizedValue ? "" : "직접입력 태그는 한글과 공백만 입력할 수 있어요."
+    );
+  };
+
   const addTag = () => {
     const nextTag = customTagInput.trim();
 
@@ -73,17 +88,20 @@ export default function UploadPage() {
       return;
     }
 
-    const isDuplicate = tags.some(
-      (tag) => tag.toLocaleLowerCase() === nextTag.toLocaleLowerCase()
-    );
+    const isDuplicate =
+      customTags.includes(nextTag) ||
+      selectedFixedTags.includes(nextTag) ||
+      FIXED_MEME_TAGS.includes(nextTag);
 
     if (isDuplicate) {
+      setTagFeedback("이미 선택했거나 추가한 태그예요.");
       setCustomTagInput("");
       return;
     }
 
-    setTags((prev) => [...prev, nextTag]);
+    setCustomTags((prev) => [...prev, nextTag]);
     setCustomTagInput("");
+    setTagFeedback("");
   };
 
   const handleTagKeyDown = (event) => {
@@ -93,14 +111,6 @@ export default function UploadPage() {
 
     event.preventDefault();
     addTag();
-  };
-
-  const handleOpenCustomTagInput = () => {
-    setIsCustomTagInputOpen(true);
-
-    window.requestAnimationFrame(() => {
-      tagInputRef.current?.focus();
-    });
   };
 
   return (
@@ -147,41 +157,50 @@ export default function UploadPage() {
             />
 
             <div className="uploadFieldGroup">
-              <span className="uploadFieldLabel">Tag</span>
-              <div className="uploadTagRow" aria-label="태그 목록">
-                {tags.map((tag) => (
-                  <span key={tag} className="uploadTagChip">
-                    {tag}
-                  </span>
-                ))}
+              <span className="uploadFieldLabel">태그</span>
 
-                <button
-                  type="button"
-                  className="uploadTagDirectBtn"
-                  onClick={handleOpenCustomTagInput}
-                >
-                  직접입력
+              <div className="uploadTagRow" aria-label="고정 태그 목록">
+                {FIXED_MEME_TAGS.map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    className={`uploadTagChip${selectedFixedTags.includes(tag) ? " isSelected" : ""}`}
+                    onClick={() => toggleFixedTag(tag)}
+                    aria-pressed={selectedFixedTags.includes(tag)}
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
+
+              <div className="uploadTagInputRow">
+                <input
+                  type="text"
+                  className="uploadTagDirectInput"
+                  placeholder="한글 태그를 직접 입력하세요"
+                  value={customTagInput}
+                  onChange={handleCustomTagInputChange}
+                  onKeyDown={handleTagKeyDown}
+                />
+                <button type="button" className="uploadTagAddBtn" onClick={addTag}>
+                  추가
                 </button>
               </div>
 
-              {isCustomTagInputOpen && (
-                <div className="uploadTagInputRow">
-                  <input
-                    ref={tagInputRef}
-                    type="text"
-                    className="uploadTagDirectInput"
-                    placeholder="추가할 태그를 입력하세요"
-                    value={customTagInput}
-                    onChange={(event) => setCustomTagInput(event.target.value)}
-                    onKeyDown={handleTagKeyDown}
-                  />
-                  <button type="button" className="uploadTagAddBtn" onClick={addTag}>
-                    추가
-                  </button>
+              {customTags.length > 0 && (
+                <div className="uploadTagRow uploadCustomTagRow" aria-label="직접 입력한 태그">
+                  {customTags.map((tag) => (
+                    <span key={tag} className="uploadTagChip isCustomTag">
+                      {tag}
+                    </span>
+                  ))}
                 </div>
               )}
 
-              <p className="uploadTagHint">원하는 태그를 직접 입력해서 추가할 수 있습니다.</p>
+              <p className={`uploadTagHint${tagFeedback ? " isError" : ""}`}>
+                {tagFeedback ||
+                  "고정 태그는 홈 필터에 쓰고, 직접입력 태그는 검색으로 이어질 수 있게 준비했어요."}
+              </p>
             </div>
 
             <button type="submit" className="uploadSubmitBtn">

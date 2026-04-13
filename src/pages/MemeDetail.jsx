@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import { useAuth } from "../auth/AuthContext";
 import { memeCatalog, userProfileMap } from "../memeData";
 
 function HeartIcon({ className = "memeDetailIcon" }) {
@@ -39,19 +40,6 @@ function MoreIcon() {
   );
 }
 
-function ChevronDownIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className="memeDetailChevron"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <path d="m6 9 6 6 6-6" />
-    </svg>
-  );
-}
-
 function SendIcon() {
   return (
     <svg
@@ -68,23 +56,17 @@ function SendIcon() {
 
 function MemeDetailContent({ currentMeme }) {
   const [likedIds, setLikedIds] = useState([]);
-  const [savedIds, setSavedIds] = useState([]);
   const [comments, setComments] = useState(currentMeme.comments);
   const [commentInput, setCommentInput] = useState("");
+  const { savedMemeIds, toggleSavedMeme } = useAuth();
   const currentAuthor = userProfileMap[currentMeme.authorId];
 
   const relatedMemes = memeCatalog.filter((item) => item.id !== currentMeme.id).slice(0, 3);
   const isLiked = likedIds.includes(currentMeme.id);
-  const isSaved = savedIds.includes(currentMeme.id);
+  const isSaved = savedMemeIds.includes(currentMeme.id);
 
   const toggleLike = (id) => {
     setLikedIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
-  };
-
-  const toggleSave = (id) => {
-    setSavedIds((prev) =>
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
     );
   };
@@ -142,15 +124,10 @@ function MemeDetailContent({ currentMeme }) {
             </div>
 
             <div className="memeDetailMetaGroup">
-              <button type="button" className="memeDetailCategoryBtn" aria-label="카테고리">
-                <ChevronDownIcon />
-                <span>{currentMeme.category}</span>
-              </button>
-
               <button
                 type="button"
                 className={`memeDetailSaveBtn${isSaved ? " isSaved" : ""}`}
-                onClick={() => toggleSave(currentMeme.id)}
+                onClick={() => toggleSavedMeme(currentMeme.id)}
               >
                 {isSaved ? "저장됨" : "저장"}
               </button>
