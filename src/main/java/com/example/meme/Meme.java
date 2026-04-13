@@ -37,10 +37,10 @@ public class Meme {
     public int getLikeCount() { return likeCount; }
     public java.util.List<Hashtag> getHashtags() { return hashtags; }
 
+    public void setUserId(Long userId) { this.userId = userId; }
     public void setTitle(String title) { this.title = title; }
     public void setFilePath(String filePath) { this.filePath = filePath; }
     public void setFileType(String fileType) { this.fileType = fileType; }
     public void setLikeCount(int likeCount) { this.likeCount = likeCount; }
     public void setHashtags(java.util.List<Hashtag> hashtags) { this.hashtags = hashtags; }
-    public void setUserId(Long userId) { this.userId = userId; }
 }

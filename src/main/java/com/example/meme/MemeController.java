@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -28,18 +29,35 @@ public class MemeController {
         this.userRepository = userRepository;
     }
 
-    // 밈 업로드 (로그인 필요)
     @PostMapping
     public ResponseEntity<?> createMeme(
             @AuthenticationPrincipal Jwt jwt,
             @RequestParam("title") String title,
             @RequestParam("tags") List<String> tags,
+            @RequestParam(value = "mediaType", required = false) String mediaType,
+            @RequestParam(value = "ageGroups", required = false) List<String> ageGroups,
             @RequestParam("file") MultipartFile file
     ) throws IOException {
         String auth0Id = jwt.getSubject();
 
         User user = userRepository.findByAuth0Id(auth0Id)
                 .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다. 먼저 로그인하세요."));
+
+        if (mediaType != null) {
+            List<String> validMediaTypes = List.of("이미지", "gif");
+            if (!validMediaTypes.contains(mediaType)) {
+                return ResponseEntity.badRequest().body("mediaType은 이미지 또는 gif 중 하나여야 합니다.");
+            }
+        }
+
+        if (ageGroups != null) {
+            List<String> validAgeGroups = List.of("10대", "20대", "30대");
+            for (String age : ageGroups) {
+                if (!validAgeGroups.contains(age)) {
+                    return ResponseEntity.badRequest().body("ageGroup은 10대, 20대, 30대 중에서만 선택 가능합니다.");
+                }
+            }
+        }
 
         String uploadDir = "uploads/";
         String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
@@ -49,13 +67,18 @@ public class MemeController {
         Files.createDirectories(filePath.getParent());
         Files.write(filePath, file.getBytes());
 
-        List<Hashtag> hashtags = tags.stream()
+        List<String> allTags = new ArrayList<>(tags);
+        if (mediaType != null) allTags.add(mediaType);
+        if (ageGroups != null) allTags.addAll(ageGroups);
+
+        List<Hashtag> hashtags = allTags.stream()
                 .map(String::trim)
                 .filter(t -> !t.isEmpty())
                 .map(tagName -> hashtagRepository.findByTag(tagName)
                         .orElseGet(() -> {
                             Hashtag h = new Hashtag();
                             h.setTag(tagName);
+                            h.setTagType(TagType.FREE);
                             return hashtagRepository.save(h);
                         }))
                 .collect(Collectors.toList());
@@ -72,7 +95,6 @@ public class MemeController {
         return ResponseEntity.ok(Map.of("message", "업로드 성공", "fileName", fileName));
     }
 
-    // 전체 밈 조회 (공개)
     @GetMapping
     public List<Meme> getAllMemes(@RequestParam(required = false) List<String> tags) {
         if (tags != null && !tags.isEmpty()) {
@@ -81,25 +103,20 @@ public class MemeController {
         return memeRepository.findAll();
     }
 
-    // 인기순 조회 (공개)
     @GetMapping("/most-liked")
     public List<Meme> getMostLiked() {
         return memeRepository.findAllOrderByLikeCountDesc();
     }
 
-    // 내가 업로드한 밈 조회 (로그인 필요)
     @GetMapping("/my")
     public ResponseEntity<?> getMyMemes(@AuthenticationPrincipal Jwt jwt) {
         String auth0Id = jwt.getSubject();
-
         User user = userRepository.findByAuth0Id(auth0Id)
                 .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
-
         List<Meme> myMemes = memeRepository.findByUserId(user.getId());
         return ResponseEntity.ok(myMemes);
     }
 
-    // 밈 삭제 (로그인 필요)
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteMeme(
             @AuthenticationPrincipal Jwt jwt,
