@@ -1,5 +1,8 @@
-package com.example.meme;
+package com.example.meme.Controllers;
 
+import com.example.meme.Hashtag;
+import com.example.meme.Repos.HashtagRepository;
+import com.example.meme.TagType;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 

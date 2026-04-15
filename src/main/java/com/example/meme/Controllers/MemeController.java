@@ -1,5 +1,9 @@
-package com.example.meme;
+package com.example.meme.Controllers;
 
+import com.example.meme.*;
+import com.example.meme.Repos.HashtagRepository;
+import com.example.meme.Repos.MemeRepository;
+import com.example.meme.Repos.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;

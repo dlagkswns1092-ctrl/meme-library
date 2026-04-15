@@ -1,4 +1,4 @@
-package com.example.meme;
+package com.example.meme.Controllers;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;

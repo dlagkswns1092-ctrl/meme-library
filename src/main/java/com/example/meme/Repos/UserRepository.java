@@ -1,5 +1,6 @@
-package com.example.meme;
+package com.example.meme.Repos;
 
+import com.example.meme.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

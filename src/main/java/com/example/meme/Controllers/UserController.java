@@ -1,4 +1,4 @@
-package com.example.meme;
+package com.example.meme.Controllers;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

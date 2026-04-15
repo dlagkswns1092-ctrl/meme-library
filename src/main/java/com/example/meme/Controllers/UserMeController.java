@@ -1,4 +1,4 @@
-package com.example.meme;
+package com.example.meme.Controllers;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -15,7 +15,6 @@ public class UserMeController {
         return Map.of(
                 "sub", jwt.getSubject(),
                 "email", jwt.getClaim("email"),
-                "name", jwt.getClaim("name"),
                 "nickname", jwt.getClaim("nickname")
         );
     }

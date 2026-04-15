@@ -1,5 +1,7 @@
-package com.example.meme;
+package com.example.meme.Controllers;
 
+import com.example.meme.User;
+import com.example.meme.Repos.UserRepository;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;

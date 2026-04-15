@@ -1,5 +1,7 @@
-package com.example.meme;
+package com.example.meme.Repos;
 
+import com.example.meme.Hashtag;
+import com.example.meme.TagType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
