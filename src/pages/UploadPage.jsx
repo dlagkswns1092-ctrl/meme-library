@@ -1,7 +1,20 @@
 import { useRef, useState } from "react";
 import Navbar from "../components/Navbar";
 import MyPageHero from "../components/MyPageHero";
-import { FIXED_MEME_TAGS, sanitizeKoreanTagInput } from "../tagData";
+import {
+  AGE_TAGS,
+  FILE_TYPE_TAGS,
+  FIXED_MEME_TAGS,
+  sanitizeKoreanTagInput,
+} from "../tagData";
+
+function RequiredStar() {
+  return (
+    <span className="uploadRequiredStar" aria-hidden="true">
+      *
+    </span>
+  );
+}
 
 function UploadArrowIcon() {
   return (
@@ -18,15 +31,53 @@ function UploadArrowIcon() {
   );
 }
 
+function getFileTypeValidationMessage(selectedFileType, file) {
+  if (!selectedFileType || !file) {
+    return "";
+  }
+
+  const lowerCaseName = file.name.toLowerCase();
+  const isGifFile = lowerCaseName.endsWith(".gif");
+
+  if (selectedFileType === "gif" && !isGifFile) {
+    return "GIF 파일을 선택해주세요.";
+  }
+
+  if (selectedFileType === "이미지" && isGifFile) {
+    return "사진 파일을 선택해주세요.";
+  }
+
+  return "";
+}
+
 export default function UploadPage() {
   const inputRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
   const [fileName, setFileName] = useState("");
   const [memeName, setMemeName] = useState("");
   const [customTagInput, setCustomTagInput] = useState("");
-  const [selectedFixedTags, setSelectedFixedTags] = useState([]);
+  const [selectedFileType, setSelectedFileType] = useState("");
+  const [selectedAgeTag, setSelectedAgeTag] = useState("");
   const [customTags, setCustomTags] = useState([]);
   const [tagFeedback, setTagFeedback] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [submitFeedback, setSubmitFeedback] = useState("");
+
+  const applySelectedFile = (file) => {
+    if (!file) {
+      return;
+    }
+
+    setSelectedFile(file);
+    setFileName(file.name);
+    setFieldErrors((prev) => ({
+      ...prev,
+      file: "",
+      fileType: getFileTypeValidationMessage(selectedFileType, file),
+    }));
+    setSubmitFeedback("");
+  };
 
   const handleBrowse = () => {
     inputRef.current?.click();
@@ -35,9 +86,7 @@ export default function UploadPage() {
   const handleFileSelect = (event) => {
     const file = event.target.files?.[0];
 
-    if (file) {
-      setFileName(file.name);
-    }
+    applySelectedFile(file);
   };
 
   const handleDragOver = (event) => {
@@ -56,19 +105,42 @@ export default function UploadPage() {
 
     const file = event.dataTransfer.files?.[0];
 
-    if (file) {
-      setFileName(file.name);
-    }
+    applySelectedFile(file);
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-  };
 
-  const toggleFixedTag = (tag) => {
-    setSelectedFixedTags((prev) =>
-      prev.includes(tag) ? prev.filter((item) => item !== tag) : [...prev, tag]
-    );
+    const nextErrors = {};
+    const trimmedName = memeName.trim();
+    const fileTypeError = getFileTypeValidationMessage(selectedFileType, selectedFile);
+
+    if (!trimmedName) {
+      nextErrors.memeName = "이름을 입력해주세요.";
+    }
+
+    if (!selectedFile) {
+      nextErrors.file = "사진을 추가해주세요.";
+    }
+
+    if (!selectedFileType) {
+      nextErrors.fileType = "파일 종류를 선택해주세요.";
+    } else if (fileTypeError) {
+      nextErrors.fileType = fileTypeError;
+    }
+
+    if (!selectedAgeTag) {
+      nextErrors.age = "나이를 선택해주세요.";
+    }
+
+    setFieldErrors(nextErrors);
+
+    if (Object.keys(nextErrors).length > 0) {
+      setSubmitFeedback("");
+      return;
+    }
+
+    setSubmitFeedback("필수 항목 입력이 완료됐어요. 업로드할 준비가 됐습니다.");
   };
 
   const handleCustomTagInputChange = (event) => {
@@ -79,6 +151,7 @@ export default function UploadPage() {
     setTagFeedback(
       nextValue === sanitizedValue ? "" : "직접입력 태그는 한글과 공백만 입력할 수 있어요."
     );
+    setSubmitFeedback("");
   };
 
   const addTag = () => {
@@ -90,7 +163,8 @@ export default function UploadPage() {
 
     const isDuplicate =
       customTags.includes(nextTag) ||
-      selectedFixedTags.includes(nextTag) ||
+      FILE_TYPE_TAGS.some((tag) => tag.value === nextTag) ||
+      AGE_TAGS.includes(nextTag) ||
       FIXED_MEME_TAGS.includes(nextTag);
 
     if (isDuplicate) {
@@ -102,6 +176,7 @@ export default function UploadPage() {
     setCustomTags((prev) => [...prev, nextTag]);
     setCustomTagInput("");
     setTagFeedback("");
+    setSubmitFeedback("");
   };
 
   const handleTagKeyDown = (event) => {
@@ -113,6 +188,27 @@ export default function UploadPage() {
     addTag();
   };
 
+  const handleNameChange = (event) => {
+    setMemeName(event.target.value);
+    setFieldErrors((prev) => ({ ...prev, memeName: "" }));
+    setSubmitFeedback("");
+  };
+
+  const handleFileTypeSelect = (fileType) => {
+    setSelectedFileType(fileType);
+    setFieldErrors((prev) => ({
+      ...prev,
+      fileType: getFileTypeValidationMessage(fileType, selectedFile),
+    }));
+    setSubmitFeedback("");
+  };
+
+  const handleAgeSelect = (ageTag) => {
+    setSelectedAgeTag(ageTag);
+    setFieldErrors((prev) => ({ ...prev, age: "" }));
+    setSubmitFeedback("");
+  };
+
   return (
     <div className="page myPage">
       <Navbar />
@@ -122,7 +218,9 @@ export default function UploadPage() {
 
         <section className="uploadEditorLayout">
           <div
-            className={`uploadDropzone${isDragging ? " isDragging" : ""}`}
+            className={`uploadDropzone${isDragging ? " isDragging" : ""}${
+              fieldErrors.file ? " isError" : ""
+            }`}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
@@ -136,42 +234,75 @@ export default function UploadPage() {
             />
 
             <UploadArrowIcon />
-            <h2>Drop the meme</h2>
+            <h2>
+              Drop the meme <RequiredStar />
+            </h2>
             <p>PNG, JPEG, or GIF up to 25MB</p>
             <button type="button" className="browseFilesBtn" onClick={handleBrowse}>
               Browse Files
             </button>
 
             {fileName && <span className="selectedFileName">{fileName}</span>}
+            {fieldErrors.file && <p className="uploadFieldError">{fieldErrors.file}</p>}
           </div>
 
           <form className="uploadFormPanel" onSubmit={handleSubmit}>
             <label className="uploadFieldLabel" htmlFor="memeName">
-              Meme Name
+              이름 <RequiredStar />
             </label>
             <input
               id="memeName"
-              className="uploadTextInput"
+              className={`uploadTextInput${fieldErrors.memeName ? " isError" : ""}`}
               value={memeName}
-              onChange={(event) => setMemeName(event.target.value)}
+              onChange={handleNameChange}
+              aria-invalid={Boolean(fieldErrors.memeName)}
             />
+            {fieldErrors.memeName && <p className="uploadFieldError">{fieldErrors.memeName}</p>}
 
             <div className="uploadFieldGroup">
-              <span className="uploadFieldLabel">태그</span>
+              <span className="uploadFieldLabel">
+                파일 종류 <RequiredStar />
+              </span>
 
-              <div className="uploadTagRow" aria-label="고정 태그 목록">
-                {FIXED_MEME_TAGS.map((tag) => (
+              <div className="uploadTagRow" aria-label="파일 종류 목록">
+                {FILE_TYPE_TAGS.map((tag) => (
+                  <button
+                    key={tag.value}
+                    type="button"
+                    className={`uploadTagChip${selectedFileType === tag.value ? " isSelected" : ""}`}
+                    onClick={() => handleFileTypeSelect(tag.value)}
+                    aria-pressed={selectedFileType === tag.value}
+                  >
+                    {tag.label}
+                  </button>
+                ))}
+              </div>
+              {fieldErrors.fileType && <p className="uploadFieldError">{fieldErrors.fileType}</p>}
+            </div>
+
+            <div className="uploadFieldGroup">
+              <span className="uploadFieldLabel">
+                나이 <RequiredStar />
+              </span>
+
+              <div className="uploadTagRow" aria-label="나이 목록">
+                {AGE_TAGS.map((tag) => (
                   <button
                     key={tag}
                     type="button"
-                    className={`uploadTagChip${selectedFixedTags.includes(tag) ? " isSelected" : ""}`}
-                    onClick={() => toggleFixedTag(tag)}
-                    aria-pressed={selectedFixedTags.includes(tag)}
+                    className={`uploadTagChip${selectedAgeTag === tag ? " isSelected" : ""}`}
+                    onClick={() => handleAgeSelect(tag)}
+                    aria-pressed={selectedAgeTag === tag}
                   >
                     {tag}
                   </button>
                 ))}
               </div>
+              {fieldErrors.age && <p className="uploadFieldError">{fieldErrors.age}</p>}
+            </div>
+
+            <div className="uploadFieldGroup">
+              <span className="uploadFieldLabel">카테고리</span>
 
               <div className="uploadTagInputRow">
                 <input
@@ -199,13 +330,16 @@ export default function UploadPage() {
 
               <p className={`uploadTagHint${tagFeedback ? " isError" : ""}`}>
                 {tagFeedback ||
-                  "고정 태그는 홈 필터에 쓰고, 직접입력 태그는 검색으로 이어질 수 있게 준비했어요."}
+                  "직접입력 태그는 한글로만 추가할 수 있어요."}
               </p>
             </div>
 
             <button type="submit" className="uploadSubmitBtn">
               업로드
             </button>
+
+            <p className="uploadRequiredNote">* 표시는 필수 입력 항목입니다.</p>
+            {submitFeedback && <p className="uploadFormFeedback isSuccess">{submitFeedback}</p>}
           </form>
         </section>
       </main>

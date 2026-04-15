@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { useAuth } from "../auth/AuthContext";
@@ -30,16 +30,6 @@ function ShareIcon() {
   );
 }
 
-function MoreIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="memeDetailIcon" aria-hidden="true" focusable="false">
-      <path d="M5 12h.01" />
-      <path d="M12 12h.01" />
-      <path d="M19 12h.01" />
-    </svg>
-  );
-}
-
 function SendIcon() {
   return (
     <svg
@@ -54,16 +44,70 @@ function SendIcon() {
   );
 }
 
+async function copyTextToClipboard(text) {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.setAttribute("readonly", "");
+  textarea.style.position = "absolute";
+  textarea.style.left = "-9999px";
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand("copy");
+  document.body.removeChild(textarea);
+}
+
 function MemeDetailContent({ currentMeme }) {
   const [likedIds, setLikedIds] = useState([]);
   const [comments, setComments] = useState(currentMeme.comments);
   const [commentInput, setCommentInput] = useState("");
+  const [isShareMenuOpen, setIsShareMenuOpen] = useState(false);
+  const [shareFeedback, setShareFeedback] = useState("");
   const { savedMemeIds, toggleSavedMeme } = useAuth();
+  const commentFormRef = useRef(null);
+  const commentInputRef = useRef(null);
+  const shareMenuRef = useRef(null);
   const currentAuthor = userProfileMap[currentMeme.authorId];
 
   const relatedMemes = memeCatalog.filter((item) => item.id !== currentMeme.id).slice(0, 3);
   const isLiked = likedIds.includes(currentMeme.id);
   const isSaved = savedMemeIds.includes(currentMeme.id);
+
+  useEffect(() => {
+    if (!isShareMenuOpen) {
+      return undefined;
+    }
+
+    const handlePointerDown = (event) => {
+      if (!shareMenuRef.current?.contains(event.target)) {
+        setIsShareMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("touchstart", handlePointerDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("touchstart", handlePointerDown);
+    };
+  }, [isShareMenuOpen]);
+
+  useEffect(() => {
+    if (!shareFeedback) {
+      return undefined;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setShareFeedback("");
+    }, 2200);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [shareFeedback]);
 
   const toggleLike = (id) => {
     setLikedIds((prev) =>
@@ -91,6 +135,23 @@ function MemeDetailContent({ currentMeme }) {
     setCommentInput("");
   };
 
+  const handleCommentButtonClick = () => {
+    commentFormRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    window.setTimeout(() => {
+      commentInputRef.current?.focus();
+    }, 220);
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      await copyTextToClipboard(window.location.href);
+      setShareFeedback("링크가 복사됐어요.");
+      setIsShareMenuOpen(false);
+    } catch {
+      setShareFeedback("링크 복사에 실패했어요.");
+    }
+  };
+
   return (
     <div className="page homePage memeDetailPage">
       <Navbar />
@@ -110,17 +171,41 @@ function MemeDetailContent({ currentMeme }) {
                 <span>{currentMeme.likes.toLocaleString()}</span>
               </button>
 
-              <button type="button" className="memeDetailIconBtn" aria-label="댓글 보기">
+              <button
+                type="button"
+                className="memeDetailIconBtn"
+                onClick={handleCommentButtonClick}
+                aria-label="댓글 입력으로 이동"
+              >
                 <CommentIcon />
               </button>
 
-              <button type="button" className="memeDetailIconBtn" aria-label="공유">
-                <ShareIcon />
-              </button>
+              <div className="memeDetailShareWrap" ref={shareMenuRef}>
+                <button
+                  type="button"
+                  className="memeDetailIconBtn"
+                  onClick={() => setIsShareMenuOpen((prev) => !prev)}
+                  aria-label="공유"
+                  aria-expanded={isShareMenuOpen}
+                  aria-haspopup="menu"
+                >
+                  <ShareIcon />
+                </button>
 
-              <button type="button" className="memeDetailIconBtn" aria-label="더보기">
-                <MoreIcon />
-              </button>
+                {isShareMenuOpen && (
+                  <div className="memeDetailShareMenu" role="menu" aria-label="공유 메뉴">
+                    <button
+                      type="button"
+                      className="memeDetailShareMenuBtn"
+                      onClick={handleCopyLink}
+                    >
+                      링크 복사
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {shareFeedback && <p className="memeDetailShareFeedback">{shareFeedback}</p>}
             </div>
 
             <div className="memeDetailMetaGroup">
@@ -178,8 +263,13 @@ function MemeDetailContent({ currentMeme }) {
               ))}
             </div>
 
-            <form className="memeDetailCommentForm" onSubmit={handleCommentSubmit}>
+            <form
+              ref={commentFormRef}
+              className="memeDetailCommentForm"
+              onSubmit={handleCommentSubmit}
+            >
               <input
+                ref={commentInputRef}
                 type="text"
                 placeholder="댓글 추가"
                 value={commentInput}

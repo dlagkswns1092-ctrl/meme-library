@@ -6,6 +6,7 @@
   --layout-desktop-width:1180px;
   --layout-tablet-width:760px;
   --layout-mobile-width:344px;
+  --meme-card-width:260px;
 }
 
 /* ===== SIGNUP PAGE ===== */
@@ -556,6 +557,7 @@
   width:100%;
   max-width:none;
   height:38px;
+  margin:0;
   border:none;
   border-radius:4px;
   background:#f1f1ef;
@@ -571,6 +573,14 @@
   align-items:center;
   justify-content:center;
   color:#1a1a1a;
+}
+
+.searchSubmitBtn{
+  padding:0;
+  border:none;
+  background:transparent;
+  cursor:pointer;
+  flex-shrink:0;
 }
 
 .navIcon{
@@ -692,30 +702,24 @@
   border-color:#111;
 }
 
-.homeFilterAdjustBtn{
-  width:36px;
-  height:36px;
-  padding:0;
-  border:none;
-  background:transparent;
-  color:#1f1f1f;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
+.homeTagSearchInput{
+  min-width:180px;
+  height:40px;
+  padding:0 14px;
+  border:1.5px solid #cfffb0;
+  border-radius:5px;
+  background:#ffffff;
+  color:#111111;
+  font-size:14px;
+  outline:none;
 }
 
-.homeFilterIcon{
-  width:20px;
-  height:20px;
+.homeTagSearchInput::placeholder{
+  color:#8e8e8e;
 }
 
-.homeFilterIcon *{
-  fill:none;
-  stroke:currentColor;
-  stroke-width:1.8;
-  stroke-linecap:round;
-  stroke-linejoin:round;
+.homeTagSearchInput:focus{
+  border-color:#9be25d;
 }
 
 .homeContent{
@@ -754,21 +758,58 @@
   font-size:15px;
 }
 
+.searchResultsContent{
+  padding-top:28px;
+}
+
+.searchResultsSection{
+  margin-top:0;
+}
+
+.searchResultsHeader{
+  margin-bottom:28px;
+}
+
+.searchResultsHeader h1{
+  margin:0;
+  color:#111111;
+  font-size:34px;
+  font-weight:900;
+  letter-spacing:-0.03em;
+}
+
+.searchResultsHeader p{
+  margin:10px 0 0;
+  color:#666666;
+  font-size:16px;
+  line-height:1.5;
+}
+
+.searchResultsHeader strong{
+  color:#111111;
+}
+
 .cardGrid{
   display:grid;
-  grid-template-columns:repeat(4, 260px);
+  grid-template-columns:repeat(auto-fit, minmax(var(--meme-card-width), var(--meme-card-width)));
   justify-content:flex-start;
   gap:51px 43px;
 }
 
 .memeCard{
   position:relative;
-  width:260px;
+  width:var(--meme-card-width);
+}
+
+.memeCardWithTitle{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
 }
 
 .thumbBox{
   position:relative;
-  width:260px;
+  width:var(--meme-card-width);
   height:215px;
   background:#ffffff;
   border-radius:30px;
@@ -796,6 +837,24 @@
   outline:3px solid #c5ff38;
   outline-offset:-3px;
   border-radius:30px;
+}
+
+.memeCardTitleLink{
+  color:inherit;
+  text-decoration:none;
+}
+
+.memeCardTitle{
+  margin:0;
+  color:#171717;
+  font-size:15px;
+  font-weight:700;
+  line-height:1.4;
+}
+
+.memeCardTitleLink:hover .memeCardTitle{
+  text-decoration:underline;
+  text-underline-offset:3px;
 }
 
 .thumbImage{
@@ -895,6 +954,12 @@
   flex-wrap:wrap;
 }
 
+.memeDetailShareWrap{
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+}
+
 .memeDetailMetaGroup{
   display:flex;
   align-items:center;
@@ -918,6 +983,48 @@
 .memeDetailIconBtn:hover,
 .memeDetailSideHeart:hover{
   transform:translateY(-1px);
+}
+
+.memeDetailShareMenu{
+  position:absolute;
+  top:calc(100% + 12px);
+  left:0;
+  min-width:132px;
+  padding:8px;
+  border:1px solid #ece7df;
+  border-radius:14px;
+  background:#ffffff;
+  box-shadow:0 14px 28px rgba(17, 17, 17, 0.08);
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  z-index:20;
+}
+
+.memeDetailShareMenuBtn{
+  min-height:38px;
+  padding:0 12px;
+  border:none;
+  border-radius:10px;
+  background:#f7f7f5;
+  color:#1f1f1f;
+  font-size:14px;
+  font-weight:700;
+  text-align:left;
+  cursor:pointer;
+  transition:background-color 0.16s ease, transform 0.16s ease;
+}
+
+.memeDetailShareMenuBtn:hover{
+  background:#efefe9;
+  transform:translateY(-1px);
+}
+
+.memeDetailShareFeedback{
+  margin:0;
+  color:#6d6d6d;
+  font-size:13px;
+  line-height:1.4;
 }
 
 .memeDetailIconBtn.isLiked{
@@ -1344,18 +1451,19 @@
   width:108px;
   min-height:88px;
   padding:14px 16px 12px;
-  border:none;
+  border:1px solid #eef4e8;
   border-radius:8px;
   background:#f7fbf3;
   color:#111111;
-  box-shadow:0 10px 22px rgba(135, 165, 104, 0.12);
+  box-shadow:0 8px 18px rgba(188, 212, 166, 0.12);
   display:flex;
   flex-direction:column;
   align-items:flex-start;
   justify-content:center;
   gap:8px;
   cursor:pointer;
-  transition:transform 0.16s ease, box-shadow 0.16s ease, background-color 0.16s ease;
+  transition:transform 0.16s ease, box-shadow 0.16s ease, background-color 0.16s ease,
+    border-color 0.16s ease;
   text-decoration:none;
 }
 
@@ -1364,8 +1472,9 @@
 }
 
 .boardSwitchBtn.isActive{
-  background:linear-gradient(180deg, #c9ff92 0%, #eef8e8 100%);
-  box-shadow:0 12px 26px rgba(178, 248, 121, 0.38);
+  border-color:#d8f8b7;
+  background:#cfff9d;
+  box-shadow:0 10px 22px rgba(178, 248, 121, 0.18);
 }
 
 .boardSwitchTitle{
@@ -1618,6 +1727,7 @@
 }
 
 .selectedFileName{
+  display:block;
   margin-top:18px;
   color:#676767;
   font-size:14px;
@@ -1637,6 +1747,18 @@
   line-height:1.3;
 }
 
+.uploadRequiredStar{
+  color:#ff5b5b;
+  font-weight:700;
+}
+
+.uploadFieldError{
+  margin:8px 0 0;
+  color:#d14b4b;
+  font-size:13px;
+  line-height:1.45;
+}
+
 .uploadTextInput{
   width:100%;
   height:54px;
@@ -1652,6 +1774,12 @@
 
 .uploadTextInput:focus{
   border-color:#b7b7b7;
+}
+
+.uploadTextInput.isError,
+.uploadDropzone.isError,
+.uploadTagDirectInput.isError{
+  border-color:#d14b4b;
 }
 
 .uploadFieldGroup{
@@ -1766,20 +1894,37 @@
   cursor:pointer;
 }
 
+.uploadRequiredNote{
+  margin:12px 0 0;
+  color:#8a8a8a;
+  font-size:13px;
+  line-height:1.45;
+}
+
+.uploadFormFeedback{
+  margin:8px 0 0;
+  font-size:13px;
+  line-height:1.45;
+}
+
+.uploadFormFeedback.isSuccess{
+  color:#3f8c16;
+}
+
 .myMemeGrid{
   display:grid;
-  grid-template-columns:repeat(4, 260px);
+  grid-template-columns:repeat(auto-fit, minmax(var(--meme-card-width), var(--meme-card-width)));
   justify-content:flex-start;
   gap:51px 43px;
 }
 
 .profileMemeCard{
-  width:260px;
+  width:var(--meme-card-width);
 }
 
 .profileThumbBox{
   position:relative;
-  width:260px;
+  width:var(--meme-card-width);
   height:215px;
   background:#ffffff;
   border-radius:30px;
@@ -1864,6 +2009,10 @@
     justify-content:flex-start;
   }
 
+  .homeTagSearchInput{
+    flex:1 1 220px;
+  }
+
   .cardGrid{
     grid-template-columns:repeat(2, 260px);
     justify-content:flex-start;
@@ -1913,6 +2062,11 @@
     justify-content:flex-start;
   }
 
+  .homeTagSearchInput{
+    width:100%;
+    min-width:0;
+  }
+
   .memeDetailLayout{
     width:min(var(--layout-mobile-width), calc(100% - 28px));
     gap:20px;
@@ -1925,6 +2079,10 @@
 
   .hero h1{
     font-size:34px;
+  }
+
+  .searchResultsHeader h1{
+    font-size:28px;
   }
 
   .searchPill{

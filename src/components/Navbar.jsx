@@ -1,4 +1,5 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 
 function SearchIcon() {
@@ -12,10 +13,36 @@ function SearchIcon() {
 
 export default function Navbar() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { isLoggedIn, displayName } = useAuth();
+  const [titleQuery, setTitleQuery] = useState("");
 
   const isAuthPage =
     location.pathname === "/login" || location.pathname === "/signup";
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+
+    if (location.pathname === "/search") {
+      setTitleQuery(searchParams.get("q") ?? "");
+      return;
+    }
+
+    setTitleQuery("");
+  }, [location.pathname, location.search]);
+
+  const handleSearchSubmit = (event) => {
+    event.preventDefault();
+
+    const nextQuery = titleQuery.trim();
+
+    if (!nextQuery) {
+      navigate("/search");
+      return;
+    }
+
+    navigate(`/search?q=${encodeURIComponent(nextQuery)}`);
+  };
 
   return (
     <header className="topbar">
@@ -25,12 +52,17 @@ export default function Navbar() {
           <span></span>
         </NavLink>
 
-        <div className="searchPill">
-          <span className="searchIcon">
+        <form className="searchPill" onSubmit={handleSearchSubmit}>
+          <button type="submit" className="searchIcon searchSubmitBtn" aria-label="제목 검색">
             <SearchIcon />
-          </span>
-          <input placeholder="" aria-label="밈 검색" />
-        </div>
+          </button>
+          <input
+            placeholder="제목 검색"
+            aria-label="밈 제목 검색"
+            value={titleQuery}
+            onChange={(event) => setTitleQuery(event.target.value)}
+          />
+        </form>
       </div>
 
       {!isAuthPage && (

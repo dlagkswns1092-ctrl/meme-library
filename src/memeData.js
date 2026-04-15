@@ -62,6 +62,7 @@ export const memeCatalog = [
     author: "홍길동",
     date: "날짜",
     fixedTags: ["이미지", "10대"],
+    searchTags: ["시험", "친구", "단체", "놀러"],
     comments: [{ id: "trend-1-comment-1", author: "이름", text: "댓글글" }],
   },
   {
@@ -76,6 +77,7 @@ export const memeCatalog = [
     author: "김민서",
     date: "날짜",
     fixedTags: ["gif", "20대"],
+    searchTags: ["조별과제", "발표", "긴장", "학교"],
     comments: [{ id: "trend-2-comment-1", author: "민지", text: "진짜 이 상황 그 자체" }],
   },
   {
@@ -90,6 +92,7 @@ export const memeCatalog = [
     author: "홍길동",
     date: "날짜",
     fixedTags: ["이미지", "30대"],
+    searchTags: ["교수님", "팀발표", "당황", "학교"],
     comments: [{ id: "trend-3-comment-1", author: "지훈", text: "저도 저장했습니다" }],
   },
   {
@@ -104,6 +107,7 @@ export const memeCatalog = [
     author: "김민서",
     date: "날짜",
     fixedTags: ["gif", "10대"],
+    searchTags: ["과제", "제출", "메신저", "학교"],
     comments: [{ id: "trend-4-comment-1", author: "서연", text: "완전 공감돼요" }],
   },
   {
@@ -118,6 +122,7 @@ export const memeCatalog = [
     author: "홍길동",
     date: "날짜",
     fixedTags: ["이미지", "20대"],
+    searchTags: ["수업", "질문", "교수님", "학교"],
     comments: [{ id: "trend-5-comment-1", author: "지우", text: "딱 제 표정이에요" }],
   },
   {
@@ -132,6 +137,7 @@ export const memeCatalog = [
     author: "김민서",
     date: "날짜",
     fixedTags: ["이미지", "30대"],
+    searchTags: ["과제", "친구", "질문", "학교"],
     comments: [{ id: "trend-6-comment-1", author: "민석", text: "이 밈 너무 웃겨요" }],
   },
   {
@@ -146,6 +152,7 @@ export const memeCatalog = [
     author: "홍길동",
     date: "날짜",
     fixedTags: ["gif", "10대"],
+    searchTags: ["시험", "단톡방", "친구", "학교"],
     comments: [{ id: "trend-7-comment-1", author: "예진", text: "진짜 공감됩니다" }],
   },
   {
@@ -160,6 +167,7 @@ export const memeCatalog = [
     author: "김민서",
     date: "날짜",
     fixedTags: ["이미지", "20대"],
+    searchTags: ["출석", "체크", "당황", "학교"],
     comments: [{ id: "trend-8-comment-1", author: "현지", text: "바로 저장했어요" }],
   },
   {
@@ -174,6 +182,7 @@ export const memeCatalog = [
     author: "홍길동",
     date: "날짜",
     fixedTags: ["이미지", "10대"],
+    searchTags: ["약속", "취소", "친구", "일상"],
     comments: [{ id: "rec-1-comment-1", author: "도윤", text: "이거 바로 저장" }],
   },
   {
@@ -188,6 +197,7 @@ export const memeCatalog = [
     author: "김민서",
     date: "날짜",
     fixedTags: ["gif", "30대"],
+    searchTags: ["퇴근", "직장", "야근", "회사"],
     comments: [{ id: "rec-2-comment-1", author: "지민", text: "현실 고증 미쳤다" }],
   },
   {
@@ -202,6 +212,7 @@ export const memeCatalog = [
     author: "홍길동",
     date: "날짜",
     fixedTags: ["이미지", "20대"],
+    searchTags: ["택배", "문자", "도착", "일상"],
     comments: [{ id: "rec-3-comment-1", author: "예린", text: "이 표정 너무 잘 알죠" }],
   },
   {
@@ -216,6 +227,7 @@ export const memeCatalog = [
     author: "김민서",
     date: "날짜",
     fixedTags: ["gif", "30대"],
+    searchTags: ["월요일", "아침", "알람", "출근"],
     comments: [{ id: "rec-4-comment-1", author: "현우", text: "제 월요일입니다" }],
   },
 ];

@@ -1,79 +1,46 @@
-import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
+import MemeCard from "../components/MemeCard";
 import { recommendedMemes, trendingMemes } from "../memeData";
-import { FIXED_MEME_TAGS } from "../tagData";
+import { FIXED_MEME_TAGS, sanitizeKoreanTagInput } from "../tagData";
 
 const INITIAL_TRENDING_COUNT = 4;
 
-function HeartIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className="heartIcon"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <path d="M12 21.35 10.55 20C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54Z" />
-    </svg>
-  );
-}
-
-function AdjustIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="homeFilterIcon" aria-hidden="true" focusable="false">
-      <path d="M4 7h10" />
-      <path d="M18 7h2" />
-      <path d="M14 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" />
-      <path d="M4 17h2" />
-      <path d="M10 17h10" />
-      <path d="M8 17a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" />
-    </svg>
-  );
-}
-
-function MemeCard({ meme, liked, onToggle }) {
-  return (
-    <article className="memeCard">
-      <div className="thumbBox">
-        <Link
-          to={`/meme/${meme.id}`}
-          className="memeCardLink"
-          aria-label={`${meme.title} 상세 보기`}
-        >
-          <img src={meme.image} alt={meme.alt} className="thumbImage" loading="lazy" />
-        </Link>
-        <button
-          type="button"
-          className={`heartBtn${liked ? " isLiked" : ""}`}
-          onClick={() => onToggle(meme.id)}
-          aria-label={liked ? "좋아요 취소" : "좋아요"}
-          aria-pressed={liked}
-        >
-          <HeartIcon />
-        </button>
-      </div>
-    </article>
-  );
+function getNormalizedTagQuery(value) {
+  return value.trim().toLowerCase();
 }
 
 export default function Home() {
   const [likedIds, setLikedIds] = useState([]);
   const [selectedFilters, setSelectedFilters] = useState([]);
+  const [tagQuery, setTagQuery] = useState("");
   const [visibleTrendingCount, setVisibleTrendingCount] = useState(INITIAL_TRENDING_COUNT);
+  const normalizedTagQuery = getNormalizedTagQuery(tagQuery);
 
   const matchesSelectedFilters = (meme) =>
     selectedFilters.length === 0 ||
     selectedFilters.some((tag) => meme.fixedTags?.includes(tag));
 
-  const filteredTrendingMemes = trendingMemes.filter(matchesSelectedFilters);
-  const filteredRecommendedMemes = recommendedMemes.filter(matchesSelectedFilters);
+  const matchesTagQuery = (meme) => {
+    if (!normalizedTagQuery) {
+      return true;
+    }
+
+    const searchableTags = [...(meme.fixedTags ?? []), ...(meme.searchTags ?? [])];
+
+    return searchableTags.some((tag) => tag.toLowerCase().includes(normalizedTagQuery));
+  };
+
+  const matchesAllFilters = (meme) => matchesSelectedFilters(meme) && matchesTagQuery(meme);
+
+  const filteredTrendingMemes = trendingMemes.filter(matchesAllFilters);
+  const filteredRecommendedMemes = recommendedMemes.filter(matchesAllFilters);
   const visibleTrendingMemes = filteredTrendingMemes.slice(0, visibleTrendingCount);
   const canLoadMoreTrending = visibleTrendingCount < filteredTrendingMemes.length;
 
   useEffect(() => {
     setVisibleTrendingCount(INITIAL_TRENDING_COUNT);
-  }, [selectedFilters]);
+  }, [selectedFilters, normalizedTagQuery]);
 
   const toggleLike = (id) => {
     setLikedIds((prev) =>
@@ -85,6 +52,10 @@ export default function Home() {
     setSelectedFilters((prev) =>
       prev.includes(tag) ? prev.filter((item) => item !== tag) : [...prev, tag]
     );
+  };
+
+  const handleTagQueryChange = (event) => {
+    setTagQuery(sanitizeKoreanTagInput(event.target.value));
   };
 
   const handleLoadMoreTrending = () => {
@@ -115,9 +86,14 @@ export default function Home() {
               {filter}
             </button>
           ))}
-          <button type="button" className="homeFilterAdjustBtn" aria-label="필터 설정">
-            <AdjustIcon />
-          </button>
+          <input
+            type="text"
+            className="homeTagSearchInput"
+            placeholder="태그 직접입력"
+            value={tagQuery}
+            onChange={handleTagQueryChange}
+            aria-label="태그 직접 입력 검색"
+          />
         </div>
       </section>
 
@@ -137,7 +113,7 @@ export default function Home() {
           </div>
 
           {visibleTrendingMemes.length === 0 && (
-            <p className="homeEmptyState">선택한 태그에 맞는 밈이 아직 없어요.</p>
+            <p className="homeEmptyState">선택한 태그나 입력한 태그에 맞는 밈이 아직 없어요.</p>
           )}
 
           {canLoadMoreTrending && visibleTrendingMemes.length > 0 && (
@@ -164,7 +140,7 @@ export default function Home() {
           </div>
 
           {filteredRecommendedMemes.length === 0 && (
-            <p className="homeEmptyState">추천 밈도 선택한 태그 기준으로 비어 있어요.</p>
+            <p className="homeEmptyState">추천 밈도 선택한 태그나 입력한 태그 기준으로 비어 있어요.</p>
           )}
         </section>
       </main>
