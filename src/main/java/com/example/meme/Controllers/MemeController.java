@@ -75,16 +75,25 @@ public class MemeController {
         if (mediaType != null) allTags.add(mediaType);
         if (ageGroups != null) allTags.addAll(ageGroups);
 
+        List<Hashtag> fixedHashtags = hashtagRepository.findByTagType(TagType.FIXED);
+
         List<Hashtag> hashtags = allTags.stream()
                 .map(String::trim)
                 .filter(t -> !t.isEmpty())
-                .map(tagName -> hashtagRepository.findByTag(tagName)
-                        .orElseGet(() -> {
-                            Hashtag h = new Hashtag();
-                            h.setTag(tagName);
-                            h.setTagType(TagType.FREE);
-                            return hashtagRepository.save(h);
-                        }))
+                .map(tagName -> {
+                    return fixedHashtags.stream()
+                            .filter(h -> h.getTag().equals(tagName))
+                            .findFirst()
+                            .orElseGet(() -> {
+                                return hashtagRepository.findByTag(tagName)
+                                        .orElseGet(() -> {
+                                            Hashtag h = new Hashtag();
+                                            h.setTag(tagName);
+                                            h.setTagType(TagType.FREE);
+                                            return hashtagRepository.save(h);
+                                        });
+                            });
+                })
                 .collect(Collectors.toList());
 
         Meme meme = new Meme();
@@ -102,7 +111,11 @@ public class MemeController {
     @GetMapping
     public List<Meme> getAllMemes(@RequestParam(required = false) List<String> tags) {
         if (tags != null && !tags.isEmpty()) {
-            return memeRepository.findByAllHashtags(tags, tags.size());
+            if (tags.size() == 1) {
+                return memeRepository.findByHashtag(tags.get(0));
+            } else {
+                return memeRepository.findByAllHashtags(tags, tags.size());
+            }
         }
         return memeRepository.findAll();
     }
