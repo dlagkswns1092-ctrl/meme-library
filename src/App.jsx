@@ -1,10 +1,12 @@
 import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+import MemeDetail from "./pages/MemeDetail";
 import MyPage from "./pages/MyPage";
+import SearchResults from "./pages/SearchResults";
 import Signup from "./pages/Signup";
 import UploadPage from "./pages/UploadPage";
-import MemeDetail from "./pages/MemeDetail";
+import UserProfile from "./pages/UserProfile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import "./App.css";
 
@@ -14,6 +16,7 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/search" element={<SearchResults />} />
             <Route path="/meme/:memeId" element={<MemeDetail />} />
             <Route
                 path="/mypage"
@@ -31,6 +34,7 @@ export default function App() {
                     </ProtectedRoute>
                 }
             />
+            <Route path="/users/:userId" element={<UserProfile />} />
         </Routes>
     );
 }

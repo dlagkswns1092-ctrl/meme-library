@@ -1,4 +1,5 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { useRef } from "react";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 
 function SearchIcon() {
@@ -22,10 +23,33 @@ function BellIcon() {
 
 export default function Navbar() {
     const location = useLocation();
+    const navigate = useNavigate();
+    const searchInputRef = useRef(null);
     const { isAuthenticated, user, logout } = useAuth0();
 
-    const isAuthPage = location.pathname === "/login" || location.pathname === "/signup";
+    const isAuthPage =
+        location.pathname === "/login" || location.pathname === "/signup";
+
     const nickname = user?.email ? user.email.split("@")[0] : "";
+
+    const searchQueryFromUrl =
+        location.pathname === "/search"
+            ? new URLSearchParams(location.search).get("q") ?? ""
+            : "";
+
+    const handleSearchSubmit = (event) => {
+        event.preventDefault();
+
+        const rawValue = searchInputRef.current?.value ?? "";
+        const nextQuery = rawValue.trim();
+
+        if (!nextQuery) {
+            navigate("/search");
+            return;
+        }
+
+        navigate(`/search?q=${encodeURIComponent(nextQuery)}`);
+    };
 
     return (
         <header className="topbar">
@@ -34,10 +58,22 @@ export default function Navbar() {
                     <span></span>
                     <span></span>
                 </NavLink>
-                <div className="searchPill">
-                    <span className="searchIcon"><SearchIcon /></span>
-                    <input placeholder="" aria-label="밈 검색" />
-                </div>
+
+                <form
+                    key={`${location.pathname}${location.search}`}
+                    className="searchPill"
+                    onSubmit={handleSearchSubmit}
+                >
+                    <button type="submit" className="searchIcon searchSubmitBtn" aria-label="제목 검색">
+                        <SearchIcon />
+                    </button>
+                    <input
+                        ref={searchInputRef}
+                        placeholder="제목 검색"
+                        aria-label="밈 제목 검색"
+                        defaultValue={searchQueryFromUrl}
+                    />
+                </form>
             </div>
 
             {!isAuthPage && (
@@ -45,25 +81,37 @@ export default function Navbar() {
                     <button type="button" className="notificationBtn" aria-label="알림">
                         <BellIcon />
                     </button>
+
                     {isAuthenticated ? (
                         <>
                             <NavLink
                                 to="/mypage"
-                                className={({ isActive }) => `profileLink${isActive ? " profileLinkActive" : ""}`}
+                                className={({ isActive }) =>
+                                    `profileLink${isActive ? " profileLinkActive" : ""}`
+                                }
                             >
                                 {nickname}님
                             </NavLink>
+
                             <button
                                 type="button"
                                 className="forgotBtn"
-                                onClick={() => logout({ logoutParams: { returnTo: `${window.location.origin}/login` } })}
+                                onClick={() =>
+                                    logout({
+                                        logoutParams: {
+                                            returnTo: `${window.location.origin}/login`,
+                                        },
+                                    })
+                                }
                                 style={{ marginLeft: "8px" }}
                             >
                                 로그아웃
                             </button>
                         </>
                     ) : (
-                        <NavLink to="/login" className="profileLink">로그인</NavLink>
+                        <NavLink to="/login" className="profileLink">
+                            로그인
+                        </NavLink>
                     )}
                 </div>
             )}
