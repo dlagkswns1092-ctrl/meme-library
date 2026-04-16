@@ -1,58 +1,123 @@
-import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import { useLocation, useNavigate, Link } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
 
 export default function Login() {
-  const handleSubmit = (event) => {
-    event.preventDefault();
-  };
+    const {
+        loginWithRedirect,
+        isAuthenticated,
+        isLoading,
+        user,
+        getAccessTokenSilently,
+    } = useAuth0();
 
-  return (
-    <div className="page loginBg">
-      <main className="loginPageFigma">
-        <div className="loginCanvas">
-          <div className="loginDecor loginDecorTop" aria-hidden="true" />
-          <div className="loginDecor loginDecorBottom" aria-hidden="true" />
+    const navigate = useNavigate();
+    const location = useLocation();
+    const redirectPath =
+        typeof location.state?.from === "string" ? location.state.from : "/";
 
-          <section className="loginBox">
-            <h1 className="loginMainTitle">밈 라이브러리</h1>
-            <div className="loginSubBadge">당신이 찾고 있는 모든 밈을 한눈에</div>
+    useEffect(() => {
+        if (!isAuthenticated || !user) return;
 
-            <form className="loginFormFigma" onSubmit={handleSubmit}>
-              <input
-                type="text"
-                placeholder="아이디"
-                className="loginInputFigma"
-                autoComplete="username"
-              />
+        const syncUser = async () => {
+            try {
+                const token = await getAccessTokenSilently();
+                const nickname = user.email ? user.email.split("@")[0] : "user";
 
-              <input
-                type="password"
-                placeholder="비밀번호"
-                className="loginInputFigma"
-                autoComplete="current-password"
-              />
+                await fetch("http://localhost:8080/api/users/sync", {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        email: user.email,
+                        nickname,
+                    }),
+                });
+            } catch (error) {
+                console.error("유저 sync 실패:", error);
+            } finally {
+                navigate(redirectPath, { replace: true });
+            }
+        };
 
-              <div className="loginOptionsRow">
-                <label className="rememberRow">
-                  <input type="checkbox" />
-                  <span>로그인 상태 유지</span>
-                </label>
+        syncUser();
+    }, [isAuthenticated, user, getAccessTokenSilently, navigate, redirectPath]);
 
-                <button type="button" className="forgotBtn">
-                  비밀번호 찾기
-                </button>
-              </div>
+    if (isLoading) return <div>로딩 중...</div>;
 
-              <button type="submit" className="loginSubmitBtn">
-                로그인
-              </button>
-            </form>
+    return (
+        <div className="page loginBg">
+            <main className="loginPageFigma">
+                <div className="loginCanvas">
+                    <div className="loginDecor loginDecorTop" aria-hidden="true" />
+                    <div className="loginDecor loginDecorBottom" aria-hidden="true" />
 
-            <p className="loginBottomText">
-              Don&apos;t have an account? <Link to="/signup">Sign up now</Link>
-            </p>
-          </section>
+                    <section className="loginBox">
+                        <h1 className="loginMainTitle">밈 라이브러리</h1>
+                        <div className="loginSubBadge">당신이 찾고 있는 모든 밈을 한눈에</div>
+
+                        <form
+                            className="loginFormFigma"
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                loginWithRedirect({
+                                    authorizationParams: {
+                                        audience: import.meta.env.VITE_AUTH0_AUDIENCE,
+                                    },
+                                });
+                            }}
+                        >
+                            <input
+                                type="text"
+                                placeholder="이메일"
+                                className="loginInputFigma"
+                                autoComplete="username"
+                            />
+                            <input
+                                type="password"
+                                placeholder="비밀번호"
+                                className="loginInputFigma"
+                                autoComplete="current-password"
+                            />
+
+                            <div className="loginOptionsRow">
+                                <label className="rememberRow">
+                                    <input type="checkbox" />
+                                    <span>로그인 상태 유지</span>
+                                </label>
+
+                                <button type="button" className="forgotBtn">
+                                    비밀번호 찾기
+                                </button>
+                            </div>
+
+                            <button type="submit" className="loginSubmitBtn">
+                                로그인
+                            </button>
+                        </form>
+
+                        <p className="loginBottomText">
+                            Don&apos;t have an account?{" "}
+                            <Link
+                                to="#"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    loginWithRedirect({
+                                        authorizationParams: {
+                                            audience: import.meta.env.VITE_AUTH0_AUDIENCE,
+                                            screen_hint: "signup",
+                                        },
+                                    });
+                                }}
+                            >
+                                Sign up now
+                            </Link>
+                        </p>
+                    </section>
+                </div>
+            </main>
         </div>
-      </main>
-    </div>
-  );
+    );
 }
