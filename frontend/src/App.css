@@ -815,7 +815,7 @@
   border-radius:30px;
   overflow:hidden;
   box-shadow:0 10px 22px rgba(17, 17, 17, 0.06),
-    0 2px 6px rgba(17, 17, 17, 0.04);
+  0 2px 6px rgba(17, 17, 17, 0.04);
 }
 
 .thumbBox::after{
@@ -907,7 +907,7 @@
 .heartBtn.isLiked{
   color:#c5ff38;
   filter:drop-shadow(0 0 5px rgba(197, 255, 56, 0.95))
-    drop-shadow(0 0 10px rgba(197, 255, 56, 0.55));
+  drop-shadow(0 0 10px rgba(197, 255, 56, 0.55));
 }
 
 .heartBtn.isLiked .heartIcon path{
@@ -1463,7 +1463,7 @@
   gap:8px;
   cursor:pointer;
   transition:transform 0.16s ease, box-shadow 0.16s ease, background-color 0.16s ease,
-    border-color 0.16s ease;
+  border-color 0.16s ease;
   text-decoration:none;
 }
 
@@ -1509,7 +1509,7 @@
   font-weight:700;
   cursor:pointer;
   transition:transform 0.16s ease, background-color 0.16s ease, color 0.16s ease,
-    border-color 0.16s ease;
+  border-color 0.16s ease;
 }
 
 .profileVisibilityBtn:hover{
@@ -1818,7 +1818,7 @@
   line-height:1.2;
   cursor:pointer;
   transition:background-color 0.16s ease, color 0.16s ease, border-color 0.16s ease,
-    transform 0.16s ease;
+  transform 0.16s ease;
 }
 
 .uploadTagChip:hover{
@@ -1930,7 +1930,7 @@
   border-radius:30px;
   overflow:hidden;
   box-shadow:0 10px 22px rgba(17, 17, 17, 0.06),
-    0 2px 6px rgba(17, 17, 17, 0.04);
+  0 2px 6px rgba(17, 17, 17, 0.04);
 }
 
 .profileThumbBox::after{
@@ -1981,11 +1981,33 @@
 .profileHeartBtn.isLiked{
   color:#c5ff38;
   filter:drop-shadow(0 0 4px rgba(197, 255, 56, 0.9))
-    drop-shadow(0 0 8px rgba(197, 255, 56, 0.45));
+  drop-shadow(0 0 8px rgba(197, 255, 56, 0.45));
 }
 
 .profileHeartBtn.isLiked .heartIcon path{
   fill:currentColor;
+}
+
+.profileDeleteBtn{
+  position:absolute;
+  bottom:15px;
+  right:15px;
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  border:none;
+  background:rgba(0,0,0,0.55);
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  transition:background 0.15s, transform 0.15s;
+}
+
+.profileDeleteBtn:hover{
+  background:rgba(220,50,50,0.85);
+  transform:scale(1.08);
 }
 
 @media (max-width: 900px){

@@ -25,7 +25,19 @@ function PlusIcon() {
     );
 }
 
-function ProfileMemeCard({ meme, liked, onToggle }) {
+function TrashIcon() {
+    return (
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6l-1 14H6L5 6" />
+            <path d="M10 11v6" />
+            <path d="M14 11v6" />
+            <path d="M9 6V4h6v2" />
+        </svg>
+    );
+}
+
+function ProfileMemeCard({ meme, liked, onToggle, onDelete }) {
     return (
         <article className="profileMemeCard">
             <div className="profileThumbBox">
@@ -44,6 +56,16 @@ function ProfileMemeCard({ meme, liked, onToggle }) {
                 >
                     <HeartIcon />
                 </button>
+                {onDelete && (
+                    <button
+                        type="button"
+                        className="profileDeleteBtn"
+                        onClick={() => onDelete(meme.id)}
+                        aria-label="밈 삭제"
+                    >
+                        <TrashIcon />
+                    </button>
+                )}
             </div>
         </article>
     );
@@ -109,6 +131,20 @@ export default function MyPage() {
         }
     };
 
+    const deleteMeme = async (memeId) => {
+        if (!window.confirm("정말 삭제할까요?")) return;
+        try {
+            const token = await getAccessTokenSilently();
+            await fetch(`${API}/api/memes/${memeId}`, {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            setUploadedMemes((prev) => prev.filter((m) => m.id !== memeId));
+        } catch (error) {
+            console.error("삭제 실패:", error);
+        }
+    };
+
     if (isLoading) return <div>로딩 중...</div>;
 
     return (
@@ -165,6 +201,7 @@ export default function MyPage() {
                                         meme={meme}
                                         liked={likedIds.includes(meme.id)}
                                         onToggle={toggleLike}
+                                        onDelete={deleteMeme}
                                     />
                                 ))
                             ) : (
