@@ -1,15 +1,26 @@
 import { Link } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
-import { useState } from "react";
+import {
+    saveProfilePreferences,
+    useProfilePreferences,
+} from "../profilePreferences";
 
 export default function MyPageHero({
                                        activeBoard,
                                        savedCount = 0,
-                                       uploadCount = 0,
-                                   }) {
+                                   uploadCount = 0,
+                               }) {
     const { user, logout } = useAuth0();
-    const nickname = user?.email ? user.email.split("@")[0] : "";
-    const [isProfilePrivate, setIsProfilePrivate] = useState(false);
+    const profilePreferences = useProfilePreferences(user);
+    const nickname = profilePreferences.nickname || (user?.email ? user.email.split("@")[0] : "");
+    const isProfilePrivate = profilePreferences.isProfilePrivate;
+
+    const handlePrivacyChange = (nextIsPrivate) => {
+        saveProfilePreferences(user, {
+            ...profilePreferences,
+            isProfilePrivate: nextIsPrivate,
+        });
+    };
 
     return (
         <section className="profileHero">
@@ -42,9 +53,9 @@ export default function MyPageHero({
                         <span>팔로워 2</span>
                     </p>
 
-                    <button type="button" className="profileEditBtn">
+                    <Link to="/mypage/edit" className="profileEditBtn">
                         프로필 수정
-                    </button>
+                    </Link>
                 </div>
             </div>
 
@@ -72,7 +83,7 @@ export default function MyPageHero({
                         <button
                             type="button"
                             className={`profileVisibilityBtn${!isProfilePrivate ? " isActive" : ""}`}
-                            onClick={() => setIsProfilePrivate(false)}
+                            onClick={() => handlePrivacyChange(false)}
                             aria-pressed={!isProfilePrivate}
                         >
                             공개
@@ -80,7 +91,7 @@ export default function MyPageHero({
                         <button
                             type="button"
                             className={`profileVisibilityBtn${isProfilePrivate ? " isActive" : ""}`}
-                            onClick={() => setIsProfilePrivate(true)}
+                            onClick={() => handlePrivacyChange(true)}
                             aria-pressed={isProfilePrivate}
                         >
                             비공개

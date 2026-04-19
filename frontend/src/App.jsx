@@ -3,6 +3,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import MemeDetail from "./pages/MemeDetail";
 import MyPage from "./pages/MyPage";
+import ProfileEditPage from "./pages/ProfileEditPage";
 import SearchResults from "./pages/SearchResults";
 import Signup from "./pages/Signup";
 import UploadPage from "./pages/UploadPage";
@@ -23,6 +24,14 @@ export default function App() {
                 element={
                     <ProtectedRoute>
                         <MyPage />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/mypage/edit"
+                element={
+                    <ProtectedRoute>
+                        <ProfileEditPage />
                     </ProtectedRoute>
                 }
             />
