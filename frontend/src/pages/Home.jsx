@@ -73,6 +73,25 @@ export default function Home() {
             .catch(console.error);
     }, []);
 
+    useEffect(() => {
+        if (!isAuthenticated) return;
+
+        const fetchLikedIds = async () => {
+            try {
+                const token = await getAccessTokenSilently();
+                const res = await fetch(`${API}/api/likes/my`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                const data = await res.json();
+                setLikedIds(Array.isArray(data) ? data.map((m) => m.id) : []);
+            } catch (error) {
+                console.error("좋아요 목록 불러오기 실패:", error);
+            }
+        };
+
+        fetchLikedIds();
+    }, [isAuthenticated, getAccessTokenSilently]);
+
     const filteredTrendingMemes = useMemo(() => {
         return trendingMemes.filter((meme) => {
             const memeTags = Array.isArray(meme.hashtags)
