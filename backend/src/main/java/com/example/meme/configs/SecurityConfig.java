@@ -38,10 +38,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/public/**").permitAll()
                         .requestMatchers("/api/memes").permitAll()          // 갤러리 조회 공개
+                        .requestMatchers("/api/memes/**").permitAll()
                         .requestMatchers("/api/memes/most-liked").permitAll() // 인기순 조회 공개
+                        .requestMatchers("/api/comments/**").permitAll()
                         .requestMatchers("/uploads/**").permitAll()        // 추가
                         .requestMatchers("/api/users").permitAll()        // 추가
-                        .requestMatchers("/api/users/**").permitAll() // 이미지 파일 공개
+                        .requestMatchers("/api/users/**").permitAll()
+                        .requestMatchers("/api/follows/status").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2

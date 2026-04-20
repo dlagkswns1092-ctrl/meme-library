@@ -123,7 +123,12 @@ export default function MyPage() {
                 data.liked ? [...prev, memeId] : prev.filter((id) => id !== memeId)
             );
 
-            if (!data.liked) {
+            if (data.liked) {
+                const meme = uploadedMemes.find((m) => m.id === memeId);
+                if (meme) {
+                    setLikedMemes((prev) => [...prev, meme]);
+                }
+            } else {
                 setLikedMemes((prev) => prev.filter((m) => m.id !== memeId));
             }
         } catch (error) {
@@ -151,7 +156,11 @@ export default function MyPage() {
         <div className="page myPage">
             <Navbar />
             <main className="myPageContent">
-                <MyPageHero activeBoard={activeBoard} />
+                <MyPageHero
+                    activeBoard={activeBoard}
+                    savedCount={likedMemes.length}
+                    uploadCount={uploadedMemes.length}
+                />
 
                 {activeBoard === "saved" ? (
                     <>

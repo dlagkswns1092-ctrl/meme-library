@@ -111,6 +111,13 @@ public class MemeController {
         return ResponseEntity.ok(Map.of("message", "업로드 성공", "fileName", fileName));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getMemeById(@PathVariable Long id) {
+        return memeRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @GetMapping
     public List<Meme> getAllMemes(@RequestParam(required = false) List<String> tags) {
         if (tags != null && !tags.isEmpty()) {

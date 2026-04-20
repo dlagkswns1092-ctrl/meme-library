@@ -31,6 +31,7 @@ public class Meme {
     public Meme() {}
 
     public Long getId() { return id; }
+    public Long getUserId() { return userId; }
     public String getTitle() { return title; }
     public String getFilePath() { return filePath; }
     public String getFileType() { return fileType; }
