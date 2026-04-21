@@ -3,7 +3,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { useState, useEffect } from "react";
 import { saveProfilePreferences, useProfilePreferences } from "../profilePreferences";
 
-const API = "http://localhost:8080";
+const API = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
 export default function MyPageHero({ activeBoard, savedCount = 0, uploadCount = 0 }) {
     const { user, logout, getAccessTokenSilently } = useAuth0();

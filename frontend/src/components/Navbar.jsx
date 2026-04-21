@@ -2,7 +2,7 @@ import { useRef, useEffect, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 
-const API = import.meta.env.VITE_API_BASE_URL;
+const API = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
 function SearchIcon() {
     return (
@@ -13,22 +13,13 @@ function SearchIcon() {
     );
 }
 
-function BellIcon() {
-    return (
-        <svg viewBox="0 0 24 24" className="navIcon bellIcon" aria-hidden="true" focusable="false">
-            <path d="M8 17.5h8" />
-            <path d="M9 18a3 3 0 0 0 6 0" />
-            <path d="M18 16V11a6 6 0 1 0-12 0v5l-1.2 1.6h14.4Z" />
-        </svg>
-    );
-}
-
 export default function Navbar() {
     const location = useLocation();
     const navigate = useNavigate();
     const searchInputRef = useRef(null);
     const { isAuthenticated, user, loginWithRedirect, logout, getAccessTokenSilently } = useAuth0();
     const [dbNickname, setDbNickname] = useState(null);
+    const returnTo = new URL(import.meta.env.BASE_URL || "/", window.location.origin).toString();
 
     const nickname = dbNickname || (user?.email ? user.email.split("@")[0] : "");
 
@@ -93,10 +84,6 @@ export default function Navbar() {
             </div>
 
             <div className="topRight">
-                <button type="button" className="notificationBtn" aria-label="알림">
-                    <BellIcon />
-                </button>
-
                 {isAuthenticated ? (
                     <>
                         <NavLink
@@ -111,7 +98,7 @@ export default function Navbar() {
                             type="button"
                             className="forgotBtn"
                             onClick={() =>
-                                logout({ logoutParams: { returnTo: window.location.origin } })
+                                logout({ logoutParams: { returnTo } })
                             }
                         >
                             로그아웃
