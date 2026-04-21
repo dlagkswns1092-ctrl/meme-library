@@ -38,9 +38,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/public/**").permitAll()
                         .requestMatchers("/api/memes").permitAll()          // 갤러리 조회 공개
-                        .requestMatchers("/api/memes/**").permitAll()
                         .requestMatchers("/api/memes/most-liked").permitAll() // 인기순 조회 공개
-                        .requestMatchers("/api/comments/**").permitAll()
                         .requestMatchers("/uploads/**").permitAll()        // 추가
                         .requestMatchers("/api/users").permitAll()        // 추가
                         .requestMatchers("/api/users/**").permitAll()
@@ -71,7 +69,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:5174"));
+        configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:5174", "https://frontend-meme-library.vercel.app"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
