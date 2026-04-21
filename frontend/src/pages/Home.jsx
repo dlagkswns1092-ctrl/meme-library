@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { FIXED_MEME_TAGS, sanitizeKoreanTagInput } from "../tagData";
 
-const API = "http://localhost:8080";
+const API = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 const INITIAL_TRENDING_COUNT = 4;
 
 function HeartIcon() {

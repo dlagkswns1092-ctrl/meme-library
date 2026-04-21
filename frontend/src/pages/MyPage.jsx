@@ -4,7 +4,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import Navbar from "../components/Navbar";
 import MyPageHero from "../components/MyPageHero";
 
-const API = "http://localhost:8080";
+const API = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 const boardFilters = ["모든 밈", "귀여운 밈", "욕", "학교", "연애"];
 
 function HeartIcon() {
