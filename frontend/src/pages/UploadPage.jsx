@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import Navbar from "../components/Navbar";
@@ -57,11 +57,39 @@ function getFileTypeValidationMessage(selectedFileType, file) {
 export default function UploadPage() {
     const inputRef = useRef(null);
     const navigate = useNavigate();
-    const { getAccessTokenSilently } = useAuth0();
+    const { getAccessTokenSilently, isAuthenticated } = useAuth0();
+
+    const [savedCount, setSavedCount] = useState(0);
+    const [uploadCount, setUploadCount] = useState(0);
+
+    useEffect(() => {
+        if (!isAuthenticated) return;
+        const fetchCounts = async () => {
+            try {
+                const token = await getAccessTokenSilently();
+                const [savedRes, uploadRes] = await Promise.all([
+                    fetch(`${API}/api/likes/my`, { headers: { Authorization: `Bearer ${token}` } }),
+                    fetch(`${API}/api/memes/my`, { headers: { Authorization: `Bearer ${token}` } }),
+                ]);
+                if (savedRes.ok) {
+                    const data = await savedRes.json();
+                    setSavedCount(Array.isArray(data) ? data.length : 0);
+                }
+                if (uploadRes.ok) {
+                    const data = await uploadRes.json();
+                    setUploadCount(Array.isArray(data) ? data.length : 0);
+                }
+            } catch (err) {
+                console.error("카운트 불러오기 실패:", err);
+            }
+        };
+        fetchCounts();
+    }, [isAuthenticated, getAccessTokenSilently]);
 
     const [isDragging, setIsDragging] = useState(false);
     const [selectedFile, setSelectedFile] = useState(null);
     const [fileName, setFileName] = useState("");
+    const [previewUrl, setPreviewUrl] = useState(null);
     const [memeName, setMemeName] = useState("");
     const [customTagInput, setCustomTagInput] = useState("");
     const [selectedFileType, setSelectedFileType] = useState("");
@@ -77,6 +105,7 @@ export default function UploadPage() {
 
         setSelectedFile(file);
         setFileName(file.name);
+        setPreviewUrl(URL.createObjectURL(file));
         setFieldErrors((prev) => ({
             ...prev,
             file: "",
@@ -149,6 +178,7 @@ export default function UploadPage() {
 
     const handleTagKeyDown = (event) => {
         if (event.key !== "Enter") return;
+        if (event.nativeEvent.isComposing) return;
         event.preventDefault();
         addTag();
     };
@@ -249,7 +279,7 @@ export default function UploadPage() {
             <Navbar />
 
             <main className="myPageContent">
-                <MyPageHero activeBoard="upload" />
+                <MyPageHero activeBoard="upload" savedCount={savedCount} uploadCount={uploadCount} />
 
                 <section className="uploadEditorLayout">
                     <div
@@ -268,16 +298,30 @@ export default function UploadPage() {
                             onChange={handleFileSelect}
                         />
 
-                        <UploadArrowIcon />
-                        <h2>
-                            Drop the meme <RequiredStar />
-                        </h2>
-                        <p>PNG, JPEG, or GIF up to 25MB</p>
-                        <button type="button" className="browseFilesBtn" onClick={handleBrowse}>
-                            Browse Files
-                        </button>
+                        {previewUrl ? (
+                            <>
+                                <img
+                                    src={previewUrl}
+                                    alt="미리보기"
+                                    style={{ maxWidth: "100%", maxHeight: "320px", borderRadius: "12px", objectFit: "contain" }}
+                                />
+                                <button type="button" className="browseFilesBtn" onClick={handleBrowse} style={{ marginTop: "12px" }}>
+                                    파일 변경
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <UploadArrowIcon />
+                                <h2>
+                                    Drop the meme <RequiredStar />
+                                </h2>
+                                <p>PNG, JPEG, or GIF up to 25MB</p>
+                                <button type="button" className="browseFilesBtn" onClick={handleBrowse}>
+                                    Browse Files
+                                </button>
+                            </>
+                        )}
 
-                        {fileName && <span className="selectedFileName">{fileName}</span>}
                         {fieldErrors.file && <p className="uploadFieldError">{fieldErrors.file}</p>}
                     </div>
 
@@ -364,6 +408,14 @@ export default function UploadPage() {
                                     {customTags.map((tag) => (
                                         <span key={tag} className="uploadTagChip isCustomTag">
                                             {tag}
+                                            <button
+                                                type="button"
+                                                className="uploadTagRemoveBtn"
+                                                onClick={() => setCustomTags((prev) => prev.filter((t) => t !== tag))}
+                                                aria-label={`${tag} 태그 삭제`}
+                                            >
+                                                ×
+                                            </button>
                                         </span>
                                     ))}
                                 </div>

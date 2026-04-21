@@ -2737,3 +2737,19 @@
   object-fit:cover;
   flex-shrink:0;
 }
+
+.uploadTagRemoveBtn{
+  margin-left:6px;
+  padding:0 2px;
+  border:none;
+  background:transparent;
+  color:#888888;
+  font-size:16px;
+  line-height:1;
+  cursor:pointer;
+  vertical-align:middle;
+}
+
+.uploadTagRemoveBtn:hover{
+  color:#d14b4b;
+}
