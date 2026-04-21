@@ -265,7 +265,16 @@ export default function MemeDetail() {
 
                         {author && (
                             <div className="detailAuthorRow">
-                                <div className="detailAuthorAvatar" />
+                                {author.profileImagePath ? (
+                                    <img
+                                        src={`${API}/uploads/${author.profileImagePath}`}
+                                        alt="프로필"
+                                        className="detailAuthorAvatar"
+                                        style={{ borderRadius: "50%", objectFit: "cover", width: "32px", height: "32px" }}
+                                    />
+                                ) : (
+                                    <div className="detailAuthorAvatar" />
+                                )}
                                 <span className="detailAuthorName">
                                     {author.nickname || author.email?.split("@")[0] || `user ${author.id}`}
                                 </span>

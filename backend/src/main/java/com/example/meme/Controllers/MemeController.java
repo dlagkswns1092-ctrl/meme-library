@@ -5,6 +5,9 @@ import com.example.meme.Entities.Hashtag;
 import com.example.meme.Entities.Meme;
 import com.example.meme.Entities.User;
 import com.example.meme.Repos.HashtagRepository;
+import com.example.meme.Repos.LikeRepository;
+import com.example.meme.Repos.SavedMemeRepository;
+import com.example.meme.Repos.CommentRepository;
 import com.example.meme.Repos.MemeRepository;
 import com.example.meme.Repos.UserRepository;
 import org.springframework.http.ResponseEntity;
@@ -29,11 +32,17 @@ public class MemeController {
     private final MemeRepository memeRepository;
     private final HashtagRepository hashtagRepository;
     private final UserRepository userRepository;
+    private final LikeRepository likeRepository;
+    private final SavedMemeRepository savedMemeRepository;
+    private final CommentRepository commentRepository;
 
-    public MemeController(MemeRepository memeRepository, HashtagRepository hashtagRepository, UserRepository userRepository) {
+    public MemeController(MemeRepository memeRepository, HashtagRepository hashtagRepository, UserRepository userRepository, LikeRepository likeRepository, SavedMemeRepository savedMemeRepository, CommentRepository commentRepository) {
         this.memeRepository = memeRepository;
         this.hashtagRepository = hashtagRepository;
         this.userRepository = userRepository;
+        this.likeRepository = likeRepository;
+        this.savedMemeRepository = savedMemeRepository;
+        this.commentRepository = commentRepository;
     }
 
     @PostMapping
@@ -151,6 +160,23 @@ public class MemeController {
     ) throws IOException {
         Meme meme = memeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("밈을 찾을 수 없습니다."));
+
+        // 관련 데이터 먼저 삭제
+        likeRepository.deleteAll(
+                likeRepository.findAll().stream()
+                        .filter(like -> like.getMeme().getId().equals(id))
+                        .toList()
+        );
+
+        savedMemeRepository.deleteAll(
+                savedMemeRepository.findAll().stream()
+                        .filter(saved -> saved.getMeme().getId().equals(id))
+                        .toList()
+        );
+
+        commentRepository.deleteAll(
+                commentRepository.findByMemeOrderByCreatedAtAsc(meme)
+        );
 
         Path filePath = Paths.get("uploads/" + meme.getFilePath());
         Files.deleteIfExists(filePath);

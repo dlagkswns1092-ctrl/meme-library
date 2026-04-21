@@ -220,13 +220,7 @@ export default function UploadPage() {
             formData.append("mediaType", selectedFileType);
             selectedAgeTags.forEach((tag) => formData.append("ageGroups", tag));
 
-            const selectedFixedTags = [
-                ...(selectedFileType ? [selectedFileType] : []),
-                ...selectedAgeTags,
-            ];
-
-            const allTags = [...new Set([...selectedFixedTags, ...customTags])];
-            allTags.forEach((tag) => formData.append("tags", tag));
+            customTags.forEach((tag) => formData.append("tags", tag));
 
             const res = await fetch(`${API}/api/memes`, {
                 method: "POST",
