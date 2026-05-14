@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/meme_library
+    url: jdbc:postgresql://localhost:5432/meme_db
     username: postgres
     password: hw040504@@
 
@@ -8,7 +8,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: https://dev-n6lgjqpsv3qu74s0.us.auth0.com/
+          issuer-uri: https://dev-wb8sg00fbz6q25fp.us.auth0.com/
 
   jpa:
     hibernate:
